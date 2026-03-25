@@ -27,16 +27,19 @@ export type AggregateUSER = {
 export type USERMinAggregateOutputType = {
   username: string | null
   password: string | null
+  token: string | null
 }
 
 export type USERMaxAggregateOutputType = {
   username: string | null
   password: string | null
+  token: string | null
 }
 
 export type USERCountAggregateOutputType = {
   username: number
   password: number
+  token: number
   _all: number
 }
 
@@ -44,16 +47,19 @@ export type USERCountAggregateOutputType = {
 export type USERMinAggregateInputType = {
   username?: true
   password?: true
+  token?: true
 }
 
 export type USERMaxAggregateInputType = {
   username?: true
   password?: true
+  token?: true
 }
 
 export type USERCountAggregateInputType = {
   username?: true
   password?: true
+  token?: true
   _all?: true
 }
 
@@ -132,6 +138,7 @@ export type USERGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type USERGroupByOutputType = {
   username: string
   password: string
+  token: string | null
   _count: USERCountAggregateOutputType | null
   _min: USERMinAggregateOutputType | null
   _max: USERMaxAggregateOutputType | null
@@ -158,11 +165,13 @@ export type USERWhereInput = {
   NOT?: Prisma.USERWhereInput | Prisma.USERWhereInput[]
   username?: Prisma.StringFilter<"USER"> | string
   password?: Prisma.StringFilter<"USER"> | string
+  token?: Prisma.StringNullableFilter<"USER"> | string | null
 }
 
 export type USEROrderByWithRelationInput = {
   username?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  token?: Prisma.SortOrderInput | Prisma.SortOrder
   _relevance?: Prisma.USEROrderByRelevanceInput
 }
 
@@ -172,11 +181,13 @@ export type USERWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.USERWhereInput[]
   NOT?: Prisma.USERWhereInput | Prisma.USERWhereInput[]
   password?: Prisma.StringFilter<"USER"> | string
+  token?: Prisma.StringNullableFilter<"USER"> | string | null
 }, "username">
 
 export type USEROrderByWithAggregationInput = {
   username?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  token?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.USERCountOrderByAggregateInput
   _max?: Prisma.USERMaxOrderByAggregateInput
   _min?: Prisma.USERMinOrderByAggregateInput
@@ -188,41 +199,49 @@ export type USERScalarWhereWithAggregatesInput = {
   NOT?: Prisma.USERScalarWhereWithAggregatesInput | Prisma.USERScalarWhereWithAggregatesInput[]
   username?: Prisma.StringWithAggregatesFilter<"USER"> | string
   password?: Prisma.StringWithAggregatesFilter<"USER"> | string
+  token?: Prisma.StringNullableWithAggregatesFilter<"USER"> | string | null
 }
 
 export type USERCreateInput = {
   username: string
   password: string
+  token?: string | null
 }
 
 export type USERUncheckedCreateInput = {
   username: string
   password: string
+  token?: string | null
 }
 
 export type USERUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type USERUncheckedUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type USERCreateManyInput = {
   username: string
   password: string
+  token?: string | null
 }
 
 export type USERUpdateManyMutationInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type USERUncheckedUpdateManyInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type USEROrderByRelevanceInput = {
@@ -234,20 +253,27 @@ export type USEROrderByRelevanceInput = {
 export type USERCountOrderByAggregateInput = {
   username?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  token?: Prisma.SortOrder
 }
 
 export type USERMaxOrderByAggregateInput = {
   username?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  token?: Prisma.SortOrder
 }
 
 export type USERMinOrderByAggregateInput = {
   username?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  token?: Prisma.SortOrder
 }
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 
@@ -255,6 +281,7 @@ export type StringFieldUpdateOperationsInput = {
 export type USERSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   username?: boolean
   password?: boolean
+  token?: boolean
 }, ExtArgs["result"]["uSER"]>
 
 
@@ -262,9 +289,10 @@ export type USERSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type USERSelectScalar = {
   username?: boolean
   password?: boolean
+  token?: boolean
 }
 
-export type USEROmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"username" | "password", ExtArgs["result"]["uSER"]>
+export type USEROmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"username" | "password" | "token", ExtArgs["result"]["uSER"]>
 
 export type $USERPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "USER"
@@ -272,6 +300,7 @@ export type $USERPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     username: string
     password: string
+    token: string | null
   }, ExtArgs["result"]["uSER"]>
   composites: {}
 }
@@ -643,6 +672,7 @@ export interface Prisma__USERClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface USERFieldRefs {
   readonly username: Prisma.FieldRef<"USER", 'String'>
   readonly password: Prisma.FieldRef<"USER", 'String'>
+  readonly token: Prisma.FieldRef<"USER", 'String'>
 }
     
 

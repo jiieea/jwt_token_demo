@@ -15,8 +15,9 @@ datasource db {
 
 // models
 model USER {
-  username String @id @db.VarChar(100)
-  password String @db.VarChar(100)
+  username String  @id @db.VarChar(100)
+  password String  @db.VarChar(100)
+  token    String? @db.LongText
 
   @@map("users")
 }
