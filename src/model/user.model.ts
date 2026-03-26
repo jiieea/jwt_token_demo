@@ -17,3 +17,7 @@ export class UserLoginResponse {
   message: string;
   token: string;
 }
+
+export class UserLogoutResponse {
+  message: string;
+}

@@ -1,8 +1,10 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { UserValidation } from './user.validation';
+import * as client from '@prisma/client';
 import {
   UserLoginRequest,
   UserLoginResponse,
+  UserLogoutResponse,
   UserRequest,
   UserResponse,
 } from '../model/user.model';
@@ -85,5 +87,16 @@ export class UserService {
       message: 'Login berhasil',
       token: token,
     };
+  }
+
+  async logout(username: string): Promise<boolean> {
+    await this.prismaService.uSER.update({
+      where: { username: username },
+      data: {
+        token: null,
+      },
+    });
+
+    return true;
   }
 }
