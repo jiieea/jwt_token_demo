@@ -72,7 +72,7 @@ export class UserService {
     if (!password) {
       throw new HttpException('Invalid password', HttpStatus.NOT_FOUND);
     }
-    const payload = { username: userLogin.username };
+    const payload = { username: userLogin.username, role: user.role };
     const token = await this.jwtService.signAsync(payload);
 
     await this.prismaService.uSER.update({

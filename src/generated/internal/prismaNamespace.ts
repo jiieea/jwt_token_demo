@@ -512,6 +512,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const USERScalarFieldEnum = {
   username: 'username',
   password: 'password',
+  role: 'role',
   token: 'token'
 } as const
 
@@ -553,6 +554,13 @@ export type USEROrderByRelevanceFieldEnum = (typeof USEROrderByRelevanceFieldEnu
  * Reference to a field of type 'String'
  */
 export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
+    
+
+
+/**
+ * Reference to a field of type 'ROLE'
+ */
+export type EnumROLEFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ROLE'>
     
 
 

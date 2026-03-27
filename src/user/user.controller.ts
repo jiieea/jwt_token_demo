@@ -6,6 +6,8 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -13,8 +15,11 @@ import {
   UserRequest,
   UserResponse,
 } from '../model/user.model';
-import { AuthGuard } from '../auth/auth.guard';
-import { User } from '../auth/auth.decorator';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { User } from '../auth/decorators/auth.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { ROLE } from '../generated/enums';
 
 @Controller('/user')
 export class UserController {
@@ -53,5 +58,12 @@ export class UserController {
     }
     await this.userService.logout(username);
     return 'User logged out';
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(ROLE.ADMIN)
+  @Get('/:username')
+  deleteUser(@Param('username') username: string) {
+    return `User ${username} berhasil dihapus oleh Admin`;
   }
 }
