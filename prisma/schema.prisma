@@ -5,6 +5,7 @@
 
 generator client {
   provider     = "prisma-client"
+  output       = "../src/generated"
   moduleFormat = "cjs"
 }
 
@@ -12,10 +13,17 @@ datasource db {
   provider = "mysql"
 }
 
+enum ROLE {
+  USER
+  ADMIN
+}
+
 // models
 model USER {
-  username String @id @db.VarChar(100)
-  password String @db.VarChar(100)
+  username String  @id @db.VarChar(100)
+  password String  @db.VarChar(100)
+  role     ROLE    @default(USER)
+  token    String? @db.LongText
 
   @@map("users")
 }
