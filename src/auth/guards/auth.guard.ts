@@ -17,10 +17,10 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = this.getTokenFromHeaders(request);
+
     if (!token) {
       throw new UnauthorizedException('Token not Valid');
     }
-
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: 'publicstaticvoid_12',

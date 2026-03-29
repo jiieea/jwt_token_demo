@@ -99,4 +99,14 @@ export class UserService {
 
     return true;
   }
+
+  async findAll() {
+    return this.prismaService.uSER.findMany({
+      select: {
+        username: true,
+        token: true,
+        role: true,
+      },
+    });
+  }
 }

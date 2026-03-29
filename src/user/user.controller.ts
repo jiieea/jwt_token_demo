@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Delete,
   Param,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -20,7 +21,9 @@ import { User } from '../auth/decorators/auth.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { ROLE } from '../generated/enums';
+import { LogInterceptor } from '../log/log.interceptor';
 
+@UseInterceptors(LogInterceptor)
 @Controller('/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -62,8 +65,19 @@ export class UserController {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(ROLE.ADMIN)
-  @Get('/:username')
+  @Delete('/:username')
   deleteUser(@Param('username') username: string) {
     return `User ${username} berhasil dihapus oleh Admin`;
+  }
+
+  @Get('/users')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(ROLE.ADMIN)
+  async getUsers() {
+    const users = await this.userService.findAll();
+    return {
+      success: true,
+      data: users,
+    };
   }
 }
