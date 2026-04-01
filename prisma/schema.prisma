@@ -24,6 +24,7 @@ model USER {
   password String  @db.VarChar(100)
   role     ROLE    @default(USER)
   token    String? @db.LongText
+  avatar   String?
 
   @@map("users")
 }

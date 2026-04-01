@@ -29,6 +29,7 @@ export type USERMinAggregateOutputType = {
   password: string | null
   role: $Enums.ROLE | null
   token: string | null
+  avatar: string | null
 }
 
 export type USERMaxAggregateOutputType = {
@@ -36,6 +37,7 @@ export type USERMaxAggregateOutputType = {
   password: string | null
   role: $Enums.ROLE | null
   token: string | null
+  avatar: string | null
 }
 
 export type USERCountAggregateOutputType = {
@@ -43,6 +45,7 @@ export type USERCountAggregateOutputType = {
   password: number
   role: number
   token: number
+  avatar: number
   _all: number
 }
 
@@ -52,6 +55,7 @@ export type USERMinAggregateInputType = {
   password?: true
   role?: true
   token?: true
+  avatar?: true
 }
 
 export type USERMaxAggregateInputType = {
@@ -59,6 +63,7 @@ export type USERMaxAggregateInputType = {
   password?: true
   role?: true
   token?: true
+  avatar?: true
 }
 
 export type USERCountAggregateInputType = {
@@ -66,6 +71,7 @@ export type USERCountAggregateInputType = {
   password?: true
   role?: true
   token?: true
+  avatar?: true
   _all?: true
 }
 
@@ -146,6 +152,7 @@ export type USERGroupByOutputType = {
   password: string
   role: $Enums.ROLE
   token: string | null
+  avatar: string | null
   _count: USERCountAggregateOutputType | null
   _min: USERMinAggregateOutputType | null
   _max: USERMaxAggregateOutputType | null
@@ -174,6 +181,7 @@ export type USERWhereInput = {
   password?: Prisma.StringFilter<"USER"> | string
   role?: Prisma.EnumROLEFilter<"USER"> | $Enums.ROLE
   token?: Prisma.StringNullableFilter<"USER"> | string | null
+  avatar?: Prisma.StringNullableFilter<"USER"> | string | null
 }
 
 export type USEROrderByWithRelationInput = {
@@ -181,6 +189,7 @@ export type USEROrderByWithRelationInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   token?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   _relevance?: Prisma.USEROrderByRelevanceInput
 }
 
@@ -192,6 +201,7 @@ export type USERWhereUniqueInput = Prisma.AtLeast<{
   password?: Prisma.StringFilter<"USER"> | string
   role?: Prisma.EnumROLEFilter<"USER"> | $Enums.ROLE
   token?: Prisma.StringNullableFilter<"USER"> | string | null
+  avatar?: Prisma.StringNullableFilter<"USER"> | string | null
 }, "username">
 
 export type USEROrderByWithAggregationInput = {
@@ -199,6 +209,7 @@ export type USEROrderByWithAggregationInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   token?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.USERCountOrderByAggregateInput
   _max?: Prisma.USERMaxOrderByAggregateInput
   _min?: Prisma.USERMinOrderByAggregateInput
@@ -212,6 +223,7 @@ export type USERScalarWhereWithAggregatesInput = {
   password?: Prisma.StringWithAggregatesFilter<"USER"> | string
   role?: Prisma.EnumROLEWithAggregatesFilter<"USER"> | $Enums.ROLE
   token?: Prisma.StringNullableWithAggregatesFilter<"USER"> | string | null
+  avatar?: Prisma.StringNullableWithAggregatesFilter<"USER"> | string | null
 }
 
 export type USERCreateInput = {
@@ -219,6 +231,7 @@ export type USERCreateInput = {
   password: string
   role?: $Enums.ROLE
   token?: string | null
+  avatar?: string | null
 }
 
 export type USERUncheckedCreateInput = {
@@ -226,6 +239,7 @@ export type USERUncheckedCreateInput = {
   password: string
   role?: $Enums.ROLE
   token?: string | null
+  avatar?: string | null
 }
 
 export type USERUpdateInput = {
@@ -233,6 +247,7 @@ export type USERUpdateInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
   token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type USERUncheckedUpdateInput = {
@@ -240,6 +255,7 @@ export type USERUncheckedUpdateInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
   token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type USERCreateManyInput = {
@@ -247,6 +263,7 @@ export type USERCreateManyInput = {
   password: string
   role?: $Enums.ROLE
   token?: string | null
+  avatar?: string | null
 }
 
 export type USERUpdateManyMutationInput = {
@@ -254,6 +271,7 @@ export type USERUpdateManyMutationInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
   token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type USERUncheckedUpdateManyInput = {
@@ -261,6 +279,7 @@ export type USERUncheckedUpdateManyInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
   token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type USEROrderByRelevanceInput = {
@@ -274,6 +293,7 @@ export type USERCountOrderByAggregateInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   token?: Prisma.SortOrder
+  avatar?: Prisma.SortOrder
 }
 
 export type USERMaxOrderByAggregateInput = {
@@ -281,6 +301,7 @@ export type USERMaxOrderByAggregateInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   token?: Prisma.SortOrder
+  avatar?: Prisma.SortOrder
 }
 
 export type USERMinOrderByAggregateInput = {
@@ -288,6 +309,7 @@ export type USERMinOrderByAggregateInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   token?: Prisma.SortOrder
+  avatar?: Prisma.SortOrder
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -309,6 +331,7 @@ export type USERSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   password?: boolean
   role?: boolean
   token?: boolean
+  avatar?: boolean
 }, ExtArgs["result"]["uSER"]>
 
 
@@ -318,9 +341,10 @@ export type USERSelectScalar = {
   password?: boolean
   role?: boolean
   token?: boolean
+  avatar?: boolean
 }
 
-export type USEROmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"username" | "password" | "role" | "token", ExtArgs["result"]["uSER"]>
+export type USEROmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"username" | "password" | "role" | "token" | "avatar", ExtArgs["result"]["uSER"]>
 
 export type $USERPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "USER"
@@ -330,6 +354,7 @@ export type $USERPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     password: string
     role: $Enums.ROLE
     token: string | null
+    avatar: string | null
   }, ExtArgs["result"]["uSER"]>
   composites: {}
 }
@@ -703,6 +728,7 @@ export interface USERFieldRefs {
   readonly password: Prisma.FieldRef<"USER", 'String'>
   readonly role: Prisma.FieldRef<"USER", 'ROLE'>
   readonly token: Prisma.FieldRef<"USER", 'String'>
+  readonly avatar: Prisma.FieldRef<"USER", 'String'>
 }
     
 

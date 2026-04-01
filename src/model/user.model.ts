@@ -21,3 +21,9 @@ export class UserLoginResponse {
 export class UserLogoutResponse {
   message: string;
 }
+
+export class UserUpdateRequest {
+  username?: string;
+  password?: string;
+  avatar?: string;
+}

@@ -1,12 +1,13 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { UserValidation } from './user.validation';
-import * as client from '@prisma/client';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   UserLoginRequest,
   UserLoginResponse,
-  UserLogoutResponse,
   UserRequest,
   UserResponse,
+  UserUpdateRequest,
 } from '../model/user.model';
 import { ValidationService } from '../validation/validation.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -51,39 +52,49 @@ export class UserService {
   }
 
   async login(request: UserLoginRequest): Promise<UserLoginResponse> {
-    const userLogin: UserLoginRequest = this.validationService.validation(
+    // 1. Validasi Input
+    const userLogin = this.validationService.validation(
       UserValidation.LOGIN,
       request,
     );
 
+    // 2. Cari di Database
     const user = await this.prismaService.uSER.findUnique({
-      where: {
-        username: userLogin.username,
-      },
+      where: { username: userLogin.username },
     });
+    console.log('3. Database Result:', user); // LIHAT DI SINI
+    // 4. Cek Password
+    // 3. Cek apakah user ada
     if (!user) {
       throw new HttpException(
-        'Password or username invalid',
+        `User ${userLogin.username} tidak ditemukan`,
         HttpStatus.NOT_FOUND,
       );
     }
 
-    const password = await bcrypt.compare(userLogin.password, user.password);
-    if (!password) {
-      throw new HttpException('Invalid password', HttpStatus.NOT_FOUND);
+    const isPasswordValid = await bcrypt.compare(
+      userLogin.password,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new HttpException('Password salah', HttpStatus.UNAUTHORIZED);
     }
-    const payload = { username: userLogin.username, role: user.role };
-    const token = await this.jwtService.signAsync(payload);
 
+    // 5. Buat Payload & Token (Gunakan data dari 'user' DB agar lebih akurat)
+    const payload = {
+      username: user.username,
+      role: user.role,
+    };
+    const token = await this.jwtService.signAsync(payload);
+    // 6. Update Token di DB
     await this.prismaService.uSER.update({
       where: { username: user.username },
-      data: {
-        token: token,
-      },
+      data: { token: token },
     });
 
+    // 7. Kembalikan Response
     return {
-      username: userLogin.username,
+      username: user.username,
       message: 'Login berhasil',
       token: token,
     };
@@ -106,6 +117,51 @@ export class UserService {
         username: true,
         token: true,
         role: true,
+      },
+    });
+  }
+
+  async update(
+    username: string,
+    request: UserUpdateRequest,
+    file?: Express.Multer.File,
+  ) {
+    const userUpdate = this.validationService.validation(
+      UserValidation.UPDATE,
+      request,
+    );
+    const user = await this.prismaService.uSER.findUnique({
+      where: { username: username },
+    });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    const updatedUser: any = {};
+    if (userUpdate.password) {
+      updatedUser.password = await bcrypt.hash(userUpdate.password, 10);
+    }
+
+    if (file) {
+      if (user.avatar) {
+        const oldPath = path.join(
+          process.cwd(),
+          'uploads/avatars',
+          user.avatar,
+        );
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+      updatedUser.avatar = file.filename;
+    }
+    return this.prismaService.uSER.update({
+      where: { username: username },
+      data: updatedUser,
+      select: {
+        username: true,
+        password: true,
+        avatar: true,
       },
     });
   }
