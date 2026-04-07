@@ -58,7 +58,6 @@ export class AuthService {
     const user = await this.prismaService.uSER.findUnique({
       where: { username: userLogin.username },
     });
-    console.log('3. Database Result:', user); // LIHAT DI SINI
     // 4. Cek Password
     // 3. Cek apakah user ada
     if (!user) {
@@ -93,6 +92,20 @@ export class AuthService {
       username: user.username,
       message: 'Login berhasil',
       token: token,
+    };
+  }
+
+  async logout(username: string) {
+    await this.prismaService.uSER.update({
+      where: { username: username },
+      data: {
+        token: null,
+      },
+    });
+
+    return {
+      message: 'Logged out',
+      status: 'success',
     };
   }
 }

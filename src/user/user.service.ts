@@ -3,8 +3,6 @@ import { UserValidation } from './user.validation';
 import * as fs from 'fs';
 import * as path from 'path';
 import {
-  UserLoginRequest,
-  UserLoginResponse,
   UserResponse,
   UserSearchRequest,
   UserUpdateRequest,
@@ -14,29 +12,15 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
 import { USER } from '../generated/client';
 
 @Injectable()
 export class UserService {
   constructor(
     private validationService: ValidationService,
-    private jwtService: JwtService,
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private prismaService: PrismaService,
   ) {}
-
-
-  async logout(username: string): Promise<boolean> {
-    await this.prismaService.uSER.update({
-      where: { username: username },
-      data: {
-        token: null,
-      },
-    });
-
-    return true;
-  }
 
   async findAll() {
     return this.prismaService.uSER.findMany({
@@ -100,7 +84,7 @@ export class UserService {
     };
   }
 
-  async search(request: UserSearchRequest, user: USER) {
+  async search(request: UserSearchRequest) {
     const searchRequest = this.validationService.validation(
       UserValidation.SEARCH,
       request,

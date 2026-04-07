@@ -4,11 +4,8 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
-  HttpStatus,
   Param,
   Patch,
-  Post,
   Query,
   UploadedFile,
   UseGuards,
@@ -16,10 +13,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { extname, join } from 'path';
-import {
-  UserSearchRequest,
-  UserUpdateRequest,
-} from '../model/user.model';
+import { UserSearchRequest, UserUpdateRequest } from '../model/user.model';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { User } from '../auth/decorators/auth.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -30,6 +24,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as client from '../generated/client';
 
+@UseInterceptors(LogInterceptor)
 @Controller('/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -43,24 +38,7 @@ export class UserController {
     };
   }
 
-  @UseGuards(AuthGuard)
-  @UseInterceptors(LogInterceptor)
-  @Post('/logout')
-  async logout(@User('username') username: string) {
-    console.log('Username yang diterima Decorator:', username); // <-- CEK DI SINI
-
-    if (!username) {
-      throw new HttpException(
-        'Username tidak terbaca dari token',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    await this.userService.logout(username);
-    return 'User logged out';
-  }
-
   @UseGuards(AuthGuard, RolesGuard)
-  @UseInterceptors(LogInterceptor)
   @Roles(ROLE.ADMIN)
   @Delete('/:username')
   deleteUser(@Param('username') username: string) {
@@ -80,7 +58,6 @@ export class UserController {
 
   @Patch('me')
   @UseGuards(AuthGuard) // Wajib login
-  @UseInterceptors(LogInterceptor)
   @UseInterceptors(
     FileInterceptor('avatar', {
       // 'avatar' adalah nama field di Postman (Body)
@@ -127,10 +104,7 @@ export class UserController {
   @HttpCode(200)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(ROLE.ADMIN)
-  async searchUsers(
-    @Query() search: UserSearchRequest,
-    @User() user: client.USER,
-  ) {
-    return this.userService.search(search, user);
+  async searchUsers(@Query() search: UserSearchRequest) {
+    return this.userService.search(search);
   }
 }
