@@ -2,6 +2,7 @@ import { z, ZodType } from 'zod';
 import {
   UserLoginRequest,
   UserRequest,
+  UserSearchRequest,
   UserUpdateRequest,
 } from '../model/user.model';
 
@@ -34,5 +35,8 @@ export class UserValidation {
       .optional(),
     password: z.string().min(1).optional(),
     avatar: z.string().min(1).optional(),
+  });
+  static readonly SEARCH: ZodType<UserSearchRequest> = z.object({
+    search: z.string().min(1).optional(),
   });
 }

@@ -5,8 +5,8 @@ import * as path from 'path';
 import {
   UserLoginRequest,
   UserLoginResponse,
-  UserRequest,
   UserResponse,
+  UserSearchRequest,
   UserUpdateRequest,
 } from '../model/user.model';
 import { ValidationService } from '../validation/validation.service';
@@ -15,6 +15,7 @@ import { Logger } from 'winston';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { USER } from '../generated/client';
 
 @Injectable()
 export class UserService {
@@ -25,80 +26,6 @@ export class UserService {
     private prismaService: PrismaService,
   ) {}
 
-  async createUser(request: UserRequest): Promise<UserResponse> {
-    const userRequest = this.validationService.validation<UserRequest>(
-      UserValidation.REGISTER,
-      request,
-    );
-    this.logger.info(`creating user ${userRequest.username}`);
-    const duplicateUser = await this.prismaService.uSER.count({
-      where: {
-        username: request.username,
-      },
-    });
-    if (duplicateUser != 0) {
-      throw new HttpException('User already exists', HttpStatus.NOT_FOUND);
-    }
-    const saltRound = 10;
-    userRequest.password = await bcrypt.hash(userRequest.password, saltRound);
-
-    const user: UserResponse = await this.prismaService.uSER.create({
-      data: userRequest,
-    });
-
-    return {
-      username: user.username,
-    };
-  }
-
-  async login(request: UserLoginRequest): Promise<UserLoginResponse> {
-    // 1. Validasi Input
-    const userLogin = this.validationService.validation(
-      UserValidation.LOGIN,
-      request,
-    );
-
-    // 2. Cari di Database
-    const user = await this.prismaService.uSER.findUnique({
-      where: { username: userLogin.username },
-    });
-    console.log('3. Database Result:', user); // LIHAT DI SINI
-    // 4. Cek Password
-    // 3. Cek apakah user ada
-    if (!user) {
-      throw new HttpException(
-        `User ${userLogin.username} tidak ditemukan`,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const isPasswordValid = await bcrypt.compare(
-      userLogin.password,
-      user.password,
-    );
-    if (!isPasswordValid) {
-      throw new HttpException('Password salah', HttpStatus.UNAUTHORIZED);
-    }
-
-    // 5. Buat Payload & Token (Gunakan data dari 'user' DB agar lebih akurat)
-    const payload = {
-      username: user.username,
-      role: user.role,
-    };
-    const token = await this.jwtService.signAsync(payload);
-    // 6. Update Token di DB
-    await this.prismaService.uSER.update({
-      where: { username: user.username },
-      data: { token: token },
-    });
-
-    // 7. Kembalikan Response
-    return {
-      username: user.username,
-      message: 'Login berhasil',
-      token: token,
-    };
-  }
 
   async logout(username: string): Promise<boolean> {
     await this.prismaService.uSER.update({
@@ -164,5 +91,44 @@ export class UserService {
         avatar: true,
       },
     });
+  }
+
+  toContactResponse(user: UserResponse): UserResponse {
+    return {
+      username: user.username,
+      role: user.role,
+    };
+  }
+
+  async search(request: UserSearchRequest, user: USER) {
+    const searchRequest = this.validationService.validation(
+      UserValidation.SEARCH,
+      request,
+    );
+
+    const whereCondition: any = {};
+
+    if (searchRequest.search) {
+      whereCondition.AND = [
+        {
+          username: {
+            contains: searchRequest.search,
+          },
+        },
+      ];
+    }
+    console.log('WHERE:', JSON.stringify(whereCondition, null, 2));
+    console.log('Search', searchRequest);
+    const users = await this.prismaService.uSER.findMany({
+      where: whereCondition,
+    });
+    const total = await this.prismaService.uSER.count({
+      where: whereCondition,
+    });
+
+    return {
+      data: users.map((user) => this.toContactResponse(user)),
+      total: total,
+    };
   }
 }

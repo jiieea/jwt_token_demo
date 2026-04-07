@@ -5,6 +5,7 @@ export class UserRequest {
 
 export class UserResponse {
   username: string;
+  role?: string;
 }
 
 export class UserLoginRequest {
@@ -18,8 +19,8 @@ export class UserLoginResponse {
   token: string;
 }
 
-export class UserLogoutResponse {
-  message: string;
+export class UserSearchRequest {
+  search?: string;
 }
 
 export class UserUpdateRequest {

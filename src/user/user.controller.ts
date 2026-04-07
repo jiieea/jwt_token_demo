@@ -1,23 +1,23 @@
 import {
-  Controller,
-  Post,
   Body,
+  Controller,
+  Delete,
   Get,
-  UseGuards,
+  HttpCode,
   HttpException,
   HttpStatus,
-  Delete,
   Param,
-  UseInterceptors,
   Patch,
+  Post,
+  Query,
   UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { extname, join } from 'path';
 import {
-  UserLoginRequest,
-  UserRequest,
-  UserResponse,
+  UserSearchRequest,
   UserUpdateRequest,
 } from '../model/user.model';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -28,22 +28,11 @@ import { ROLE } from '../generated/enums';
 import { LogInterceptor } from '../log/log.interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import * as client from '../generated/client';
 
 @Controller('/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Post('/')
-  async create(@Body() request: UserRequest) {
-    await this.userService.createUser(request);
-    return 'User created';
-  }
-
-  @Post('/login')
-  signIn(@Body() signInDto: UserLoginRequest): Promise<UserResponse> {
-    console.log('Data yang masuk ke Controller:', signInDto);
-    return this.userService.login(signInDto);
-  }
 
   @UseGuards(AuthGuard)
   @Get('/profile')
@@ -132,5 +121,16 @@ export class UserController {
     @UploadedFile() file: Express.Multer.File, // Ambil data file foto
   ) {
     return this.userService.update(username, updateUserDto, file);
+  }
+
+  @Get('')
+  @HttpCode(200)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(ROLE.ADMIN)
+  async searchUsers(
+    @Query() search: UserSearchRequest,
+    @User() user: client.USER,
+  ) {
+    return this.userService.search(search, user);
   }
 }
