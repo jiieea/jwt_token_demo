@@ -1,12 +1,13 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { UserValidation } from './user.validation';
-import * as client from '@prisma/client';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   UserLoginRequest,
   UserLoginResponse,
-  UserLogoutResponse,
-  UserRequest,
   UserResponse,
+  UserSearchRequest,
+  UserUpdateRequest,
 } from '../model/user.model';
 import { ValidationService } from '../validation/validation.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -14,6 +15,7 @@ import { Logger } from 'winston';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { USER } from '../generated/client';
 
 @Injectable()
 export class UserService {
@@ -24,70 +26,6 @@ export class UserService {
     private prismaService: PrismaService,
   ) {}
 
-  async createUser(request: UserRequest): Promise<UserResponse> {
-    const userRequest = this.validationService.validation<UserRequest>(
-      UserValidation.REGISTER,
-      request,
-    );
-    this.logger.info(`creating user ${userRequest.username}`);
-    const duplicateUser = await this.prismaService.uSER.count({
-      where: {
-        username: request.username,
-      },
-    });
-    if (duplicateUser != 0) {
-      throw new HttpException('User already exists', HttpStatus.NOT_FOUND);
-    }
-    const saltRound = 10;
-    userRequest.password = await bcrypt.hash(userRequest.password, saltRound);
-
-    const user: UserResponse = await this.prismaService.uSER.create({
-      data: userRequest,
-    });
-
-    return {
-      username: user.username,
-    };
-  }
-
-  async login(request: UserLoginRequest): Promise<UserLoginResponse> {
-    const userLogin: UserLoginRequest = this.validationService.validation(
-      UserValidation.LOGIN,
-      request,
-    );
-
-    const user = await this.prismaService.uSER.findUnique({
-      where: {
-        username: userLogin.username,
-      },
-    });
-    if (!user) {
-      throw new HttpException(
-        'Password or username invalid',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const password = await bcrypt.compare(userLogin.password, user.password);
-    if (!password) {
-      throw new HttpException('Invalid password', HttpStatus.NOT_FOUND);
-    }
-    const payload = { username: userLogin.username, role: user.role };
-    const token = await this.jwtService.signAsync(payload);
-
-    await this.prismaService.uSER.update({
-      where: { username: user.username },
-      data: {
-        token: token,
-      },
-    });
-
-    return {
-      username: userLogin.username,
-      message: 'Login berhasil',
-      token: token,
-    };
-  }
 
   async logout(username: string): Promise<boolean> {
     await this.prismaService.uSER.update({
@@ -108,5 +46,89 @@ export class UserService {
         role: true,
       },
     });
+  }
+
+  async update(
+    username: string,
+    request: UserUpdateRequest,
+    file?: Express.Multer.File,
+  ) {
+    const userUpdate = this.validationService.validation(
+      UserValidation.UPDATE,
+      request,
+    );
+    const user = await this.prismaService.uSER.findUnique({
+      where: { username: username },
+    });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    const updatedUser: any = {};
+    if (userUpdate.password) {
+      updatedUser.password = await bcrypt.hash(userUpdate.password, 10);
+    }
+
+    if (file) {
+      if (user.avatar) {
+        const oldPath = path.join(
+          process.cwd(),
+          'uploads/avatars',
+          user.avatar,
+        );
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+      updatedUser.avatar = file.filename;
+    }
+    return this.prismaService.uSER.update({
+      where: { username: username },
+      data: updatedUser,
+      select: {
+        username: true,
+        password: true,
+        avatar: true,
+      },
+    });
+  }
+
+  toContactResponse(user: UserResponse): UserResponse {
+    return {
+      username: user.username,
+      role: user.role,
+    };
+  }
+
+  async search(request: UserSearchRequest, user: USER) {
+    const searchRequest = this.validationService.validation(
+      UserValidation.SEARCH,
+      request,
+    );
+
+    const whereCondition: any = {};
+
+    if (searchRequest.search) {
+      whereCondition.AND = [
+        {
+          username: {
+            contains: searchRequest.search,
+          },
+        },
+      ];
+    }
+    console.log('WHERE:', JSON.stringify(whereCondition, null, 2));
+    console.log('Search', searchRequest);
+    const users = await this.prismaService.uSER.findMany({
+      where: whereCondition,
+    });
+    const total = await this.prismaService.uSER.count({
+      where: whereCondition,
+    });
+
+    return {
+      data: users.map((user) => this.toContactResponse(user)),
+      total: total,
+    };
   }
 }

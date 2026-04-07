@@ -74,7 +74,8 @@ export const USERScalarFieldEnum = {
   username: 'username',
   password: 'password',
   role: 'role',
-  token: 'token'
+  token: 'token',
+  avatar: 'avatar'
 } as const
 
 export type USERScalarFieldEnum = (typeof USERScalarFieldEnum)[keyof typeof USERScalarFieldEnum]
@@ -99,7 +100,8 @@ export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 export const USEROrderByRelevanceFieldEnum = {
   username: 'username',
   password: 'password',
-  token: 'token'
+  token: 'token',
+  avatar: 'avatar'
 } as const
 
 export type USEROrderByRelevanceFieldEnum = (typeof USEROrderByRelevanceFieldEnum)[keyof typeof USEROrderByRelevanceFieldEnum]
