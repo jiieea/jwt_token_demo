@@ -4,11 +4,9 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
-  HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
-  Post,
   Query,
   UploadedFile,
   UseGuards,
@@ -16,10 +14,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { extname, join } from 'path';
-import {
-  UserSearchRequest,
-  UserUpdateRequest,
-} from '../model/user.model';
+import { UserSearchRequest, UserUpdateRequest } from '../model/user.model';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { User } from '../auth/decorators/auth.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -28,8 +23,11 @@ import { ROLE } from '../generated/enums';
 import { LogInterceptor } from '../log/log.interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import * as client from '../generated/client';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags('User')
+@UseInterceptors(LogInterceptor)
 @Controller('/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -43,35 +41,23 @@ export class UserController {
     };
   }
 
-  @UseGuards(AuthGuard)
-  @UseInterceptors(LogInterceptor)
-  @Post('/logout')
-  async logout(@User('username') username: string) {
-    console.log('Username yang diterima Decorator:', username); // <-- CEK DI SINI
-
-    if (!username) {
-      throw new HttpException(
-        'Username tidak terbaca dari token',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    await this.userService.logout(username);
-    return 'User logged out';
-  }
-
   @UseGuards(AuthGuard, RolesGuard)
-  @UseInterceptors(LogInterceptor)
   @Roles(ROLE.ADMIN)
   @Delete('/:username')
+  @ApiOperation({ summary: 'Kick Unauthorized User' })
   deleteUser(@Param('username') username: string) {
     return `User ${username} berhasil dihapus oleh Admin`;
   }
 
   @Get('/users')
   @UseGuards(AuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Get all users' })
   @Roles(ROLE.ADMIN)
-  async getUsers() {
-    const users = await this.userService.findAll();
+  async getUsers(
+    @Query('size', ParseIntPipe) size: number,
+    @Query('page', ParseIntPipe) page: number,
+  ) {
+    const users = await this.userService.findAll(page, size);
     return {
       success: true,
       data: users,
@@ -80,7 +66,7 @@ export class UserController {
 
   @Patch('me')
   @UseGuards(AuthGuard) // Wajib login
-  @UseInterceptors(LogInterceptor)
+  @ApiOperation({ summary: 'Update user profile' })
   @UseInterceptors(
     FileInterceptor('avatar', {
       // 'avatar' adalah nama field di Postman (Body)
@@ -127,10 +113,12 @@ export class UserController {
   @HttpCode(200)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(ROLE.ADMIN)
+  @ApiOperation({ summary: 'Search Users' })
   async searchUsers(
     @Query() search: UserSearchRequest,
-    @User() user: client.USER,
+    @Query('size', ParseIntPipe) size: number,
+    @Query('page', ParseIntPipe) page: number,
   ) {
-    return this.userService.search(search, user);
+    return this.userService.search(search, size, page);
   }
 }
