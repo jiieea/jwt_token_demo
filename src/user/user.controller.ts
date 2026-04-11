@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseIntPipe,
   Patch,
   Query,
   UploadedFile,
@@ -22,8 +23,10 @@ import { ROLE } from '../generated/enums';
 import { LogInterceptor } from '../log/log.interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import * as client from '../generated/client';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags('User')
 @UseInterceptors(LogInterceptor)
 @Controller('/user')
 export class UserController {
@@ -41,15 +44,20 @@ export class UserController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(ROLE.ADMIN)
   @Delete('/:username')
+  @ApiOperation({ summary: 'Kick Unauthorized User' })
   deleteUser(@Param('username') username: string) {
     return `User ${username} berhasil dihapus oleh Admin`;
   }
 
   @Get('/users')
   @UseGuards(AuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Get all users' })
   @Roles(ROLE.ADMIN)
-  async getUsers() {
-    const users = await this.userService.findAll();
+  async getUsers(
+    @Query('size', ParseIntPipe) size: number,
+    @Query('page', ParseIntPipe) page: number,
+  ) {
+    const users = await this.userService.findAll(page, size);
     return {
       success: true,
       data: users,
@@ -58,6 +66,7 @@ export class UserController {
 
   @Patch('me')
   @UseGuards(AuthGuard) // Wajib login
+  @ApiOperation({ summary: 'Update user profile' })
   @UseInterceptors(
     FileInterceptor('avatar', {
       // 'avatar' adalah nama field di Postman (Body)
@@ -104,7 +113,12 @@ export class UserController {
   @HttpCode(200)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(ROLE.ADMIN)
-  async searchUsers(@Query() search: UserSearchRequest) {
-    return this.userService.search(search);
+  @ApiOperation({ summary: 'Search Users' })
+  async searchUsers(
+    @Query() search: UserSearchRequest,
+    @Query('size', ParseIntPipe) size: number,
+    @Query('page', ParseIntPipe) page: number,
+  ) {
+    return this.userService.search(search, size, page);
   }
 }
