@@ -52,6 +52,40 @@ export class UserService {
     };
   }
 
+  async deleteAvatar(username: string) {
+    const user = await this.prismaService.uSER.findUnique({
+      where: { username },
+    });
+
+    if (!user) {
+      return `User not found`;
+    }
+
+    if (user.avatar) {
+      const avatarPath = path.join(
+        process.cwd(),
+        'uploads/avatars',
+        user.avatar,
+      );
+
+      if (fs.existsSync(avatarPath)) {
+        fs.unlinkSync(avatarPath);
+      }
+    }
+
+    await this.prismaService.uSER.update({
+      where: { username },
+      data: {
+        avatar: null,
+      },
+    });
+
+    return {
+      message: 'Avatar Deleted',
+      status: 'success',
+    };
+  }
+
   async update(
     username: string,
     request: UserUpdateRequest,

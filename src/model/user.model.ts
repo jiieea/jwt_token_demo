@@ -27,6 +27,10 @@ export class UserSearchRequest {
   search?: string;
 }
 
+export class AvatarPath {
+  avatar?: string;
+}
+
 export class UserUpdateRequest {
   username?: string;
   password?: string;

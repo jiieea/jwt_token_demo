@@ -4,17 +4,26 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpException,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   Query,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import express from 'express';
 import { UserService } from './user.service';
 import { extname, join } from 'path';
-import { UserSearchRequest, UserUpdateRequest } from '../model/user.model';
+import {
+  AvatarPath,
+  UserSearchRequest,
+  UserUpdateRequest,
+} from '../model/user.model';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { User } from '../auth/decorators/auth.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -24,14 +33,24 @@ import { LogInterceptor } from '../log/log.interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-
+import * as fs from 'fs';
+import * as client from '../generated/client';
 
 @ApiTags('User')
-@UseInterceptors(LogInterceptor)
 @Controller('/user')
+@UseInterceptors(LogInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  @Get('/avatar/:filename')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(ROLE.ADMIN)
+  getTest(@Res() res: any, @Param('filename') filename: string) {
+    const file = join(process.cwd(), 'uploads/avatars', filename);
+    if (!fs.existsSync(file)) {
+      return res.send(`File Not Found`);
+    }
+    return res.sendFile(file);
+  }
   @UseGuards(AuthGuard)
   @Get('/profile')
   getProfile(@User('username') user) {
@@ -39,6 +58,12 @@ export class UserController {
       message: 'Ini data profil kamu',
       user: user,
     };
+  }
+
+  @Post('/profile')
+  @UseGuards(AuthGuard)
+  async deleteAvatar(@User('username') user: string) {
+    return this.userService.deleteAvatar(user);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -109,7 +134,7 @@ export class UserController {
     return this.userService.update(username, updateUserDto, file);
   }
 
-  @Get('')
+  @Get('/search')
   @HttpCode(200)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(ROLE.ADMIN)
