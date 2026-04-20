@@ -35,6 +35,7 @@ import { diskStorage } from 'multer';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import * as fs from 'fs';
 import * as client from '../generated/client';
+import { avatarStorage, imageFilter } from '../../uploads/upload.config';
 
 @ApiTags('User')
 @Controller('/user')
@@ -44,7 +45,7 @@ export class UserController {
   @Get('/avatar/:filename')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(ROLE.ADMIN)
-  getTest(@Res() res: any, @Param('filename') filename: string) {
+  getAvatar(@Res() res: any, @Param('filename') filename: string) {
     const file = join(process.cwd(), 'uploads/avatars', filename);
     if (!fs.existsSync(file)) {
       return res.send(`File Not Found`);
@@ -96,31 +97,9 @@ export class UserController {
     FileInterceptor('avatar', {
       // 'avatar' adalah nama field di Postman (Body)
       // Konfigurasi Multer untuk menyimpan di disk (folder lokal)
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          const uploadPath = join(process.cwd(), 'uploads/avatars');
-          // Pastikan folder avatars di dalam uploads sudah kamu buat juga ya!
-          cb(null, uploadPath);
-        },
-        filename: (req, file, cb) => {
-          // Buat nama file unik agar tidak bentrok (misal: budi-123456789.jpg)
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          cb(null, `${randomName}${extname(file.originalname)}`);
-        },
-      }),
+      storage: avatarStorage,
       // Validasi file (Opsional tapi PENTING)
-      fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-          return cb(
-            new Error('Hanya file gambar (jpg, jpeg, png) yang diperbolehkan!'),
-            false,
-          );
-        }
-        cb(null, true);
-      },
+      fileFilter: imageFilter,
       limits: {
         fileSize: 1024 * 1024 * 2, // Batasi ukuran maksimal 2MB
       },
