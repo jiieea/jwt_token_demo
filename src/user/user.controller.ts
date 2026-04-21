@@ -4,8 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
-  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -16,14 +14,9 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import express from 'express';
 import { UserService } from './user.service';
-import { extname, join } from 'path';
-import {
-  AvatarPath,
-  UserSearchRequest,
-  UserUpdateRequest,
-} from '../model/user.model';
+import { join } from 'path';
+import { UserSearchRequest, UserUpdateRequest } from '../model/user.model';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { User } from '../auth/decorators/auth.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -36,6 +29,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import * as fs from 'fs';
 import * as client from '../generated/client';
 import { avatarStorage, imageFilter } from '../../uploads/upload.config';
+import { CleanUpInterceptor } from '../../uploads/upload.interceptor';
 
 @ApiTags('User')
 @Controller('/user')
@@ -104,6 +98,7 @@ export class UserController {
         fileSize: 1024 * 1024 * 2, // Batasi ukuran maksimal 2MB
       },
     }),
+    CleanUpInterceptor,
   )
   async updateMe(
     @User('username') username: string, // Ambil username dari token
