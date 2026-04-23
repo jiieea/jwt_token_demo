@@ -10,6 +10,7 @@ export class UserRequest {
 export class UserResponse {
   username: string;
   role?: string;
+  avatar?: string | null;
 }
 
 export class UserLoginRequest {
@@ -25,6 +26,10 @@ export class UserLoginResponse {
 
 export class UserSearchRequest {
   search?: string;
+}
+
+export class AvatarPath {
+  avatar?: string;
 }
 
 export class UserUpdateRequest {

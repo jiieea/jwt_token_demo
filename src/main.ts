@@ -17,7 +17,6 @@ async function bootstrap() {
 
   const docs = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, docs);
-  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   app.useGlobalFilters(new UserFilter());
   app.useLogger(logger);

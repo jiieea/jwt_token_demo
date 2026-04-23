@@ -12,6 +12,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { WebModel } from '../model/web.model';
 
 @Injectable()
 export class UserService {
@@ -21,14 +22,15 @@ export class UserService {
     private prismaService: PrismaService,
   ) {}
 
-  toContactResponse(user: UserResponse): UserResponse {
+  toUserResponse(user: UserResponse): UserResponse {
     return {
       username: user.username,
       role: user.role,
+      avatar: user.avatar,
     };
   }
 
-  async findAll(page: number, size: number) {
+  async findAll(page: number, size: number): Promise<WebModel<UserResponse[]>> {
     const skip = (page - 1) * size;
     const users = await this.prismaService.uSER.findMany({
       take: size,
@@ -43,12 +45,46 @@ export class UserService {
     const total = await this.prismaService.uSER.count();
 
     return {
-      data: users,
+      data: users.map((user) => this.toUserResponse(user)),
       paging: {
-        page: page,
+        pages: page,
         total_item: total,
         total_page: Math.ceil(total / size),
       },
+    };
+  }
+
+  async deleteAvatar(username: string) {
+    const user = await this.prismaService.uSER.findUnique({
+      where: { username },
+    });
+
+    if (!user) {
+      return `User not found`;
+    }
+
+    if (user.avatar) {
+      const avatarPath = path.join(
+        process.cwd(),
+        'uploads/avatars',
+        user.avatar,
+      );
+
+      if (fs.existsSync(avatarPath)) {
+        fs.unlinkSync(avatarPath);
+      }
+    }
+
+    await this.prismaService.uSER.update({
+      where: { username },
+      data: {
+        avatar: null,
+      },
+    });
+
+    return {
+      message: 'Avatar Deleted',
+      status: 'success',
     };
   }
 
@@ -97,7 +133,11 @@ export class UserService {
     });
   }
 
-  async search(request: UserSearchRequest, size: number, page: number) {
+  async search(
+    request: UserSearchRequest,
+    size: number,
+    page: number,
+  ): Promise<WebModel<UserResponse[]>> {
     const searchRequest = this.validationService.validation(
       UserValidation.SEARCH,
       request,
@@ -125,9 +165,9 @@ export class UserService {
     });
 
     return {
-      data: users.map((user) => this.toContactResponse(user)),
+      data: users.map((user) => this.toUserResponse(user)),
       paging: {
-        page: page,
+        pages: page,
         total_item: total,
         total_page: Math.ceil(total / size),
       },
