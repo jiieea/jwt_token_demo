@@ -37,7 +37,7 @@ export class CleanUpInterceptor implements NestInterceptor {
           typeof request.file === 'object' &&
           !Array.isArray(request.file)
         ) {
-          Object.values(request.file).forEach((fileArray) => {
+          Object.values(request.file).forEach((fileArray: any) => {
             fileArray.forEach((file) => {
               const filePath = join(
                 process.cwd(),
@@ -55,10 +55,8 @@ export class CleanUpInterceptor implements NestInterceptor {
               if (fs.existsSync(file)) {
                 await fs.promises.unlink(file);
               }
-            } catch (err: unknown) {
-              if (err instanceof Error) {
-                console.error(`Cleanup Error: ${err}`);
-              }
+            } catch {
+              console.error(`Cleanup Error: ${err}`);
             }
           }),
         );

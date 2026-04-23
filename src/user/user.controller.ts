@@ -24,12 +24,11 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { ROLE } from '../generated/enums';
 import { LogInterceptor } from '../log/log.interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import * as fs from 'fs';
-import * as client from '../generated/client';
 import { avatarStorage, imageFilter } from '../../uploads/upload.config';
 import { CleanUpInterceptor } from '../../uploads/upload.interceptor';
+import { WebModel } from '../model/web.model';
 
 @ApiTags('User')
 @Controller('/user')
@@ -76,12 +75,8 @@ export class UserController {
   async getUsers(
     @Query('size', ParseIntPipe) size: number,
     @Query('page', ParseIntPipe) page: number,
-  ) {
-    const users = await this.userService.findAll(page, size);
-    return {
-      success: true,
-      data: users,
-    };
+  ): Promise<WebModel<any>> {
+    return this.userService.findAll(size, page);
   }
 
   @Patch('me')

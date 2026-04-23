@@ -2,7 +2,7 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 
 export const avatarStorage = diskStorage({
-  destination: join(process.cwd(), '../uploads/avatars'),
+  destination: join(process.cwd(), 'uploads/avatars'),
 
   filename: (req, file, cb) => {
     const imageName = Date.now() + '-' + Math.floor(Math.random() * 1000);

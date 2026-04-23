@@ -10,6 +10,7 @@ export class UserRequest {
 export class UserResponse {
   username: string;
   role?: string;
+  avatar?: string | null;
 }
 
 export class UserLoginRequest {
