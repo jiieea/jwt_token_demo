@@ -3,9 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
 import { ValidationService } from './validation/validation.service';
+import { TestModule } from '../test/test.module';
 
 @Module({
-  imports: [CommonModule],
+  imports: [CommonModule, TestModule],
   controllers: [AppController],
   providers: [AppService, ValidationService],
 })
