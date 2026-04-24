@@ -2,6 +2,7 @@ import { AuthService } from './auth.service';
 import {
   Body,
   Controller,
+  HttpCode,
   Post,
   UseGuards,
   UseInterceptors,
@@ -19,9 +20,10 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/')
+  @HttpCode(201)
   async create(@Body() request: UserRequest) {
-    await this.authService.createUser(request);
-    return `Username ${request.username} has been created successfully`;
+    const user = await this.authService.createUser(request);
+    return user;
   }
 
   @Post('/login')

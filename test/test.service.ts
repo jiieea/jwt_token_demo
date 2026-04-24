@@ -1,6 +1,7 @@
-import { OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
 
+@Injectable()
 export class TestService implements OnModuleDestroy {
   constructor(private prisma: PrismaService) {}
 
@@ -24,10 +25,4 @@ export class TestService implements OnModuleDestroy {
       },
     });
   }
-
-  // async getAllUsers() {
-  //   await this.prisma.uSER.findMany({
-  //
-  //   })
-  // }
 }

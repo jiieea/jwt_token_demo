@@ -45,7 +45,7 @@ export class UserService {
     const total = await this.prismaService.uSER.count();
 
     return {
-      data: users.map((user) => this.toUserResponse(user)),
+      data: users.map((user: UserResponse) => this.toUserResponse(user)),
       paging: {
         pages: page,
         total_item: total,
