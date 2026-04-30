@@ -1,6 +1,6 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
-
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class TestService implements OnModuleDestroy {
   constructor(private prisma: PrismaService) {}
@@ -10,10 +10,11 @@ export class TestService implements OnModuleDestroy {
   }
 
   async createUser() {
+    const hashedPassword = await bcrypt.hash('123456', 10);
     await this.prisma.uSER.create({
       data: {
         username: 'TestSample',
-        password: '123456',
+        password: hashedPassword,
       },
     });
   }

@@ -8,7 +8,7 @@ import { ZodError } from 'zod';
 import { Response } from 'express';
 import multer from 'multer';
 
-@Catch(ZodError, HttpException)
+@Catch()
 export class UserFilter<T> implements ExceptionFilter {
   catch(exception: T, host: ArgumentsHost) {
     const response = host.switchToHttp().getResponse<Response>();
