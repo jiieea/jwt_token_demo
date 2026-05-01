@@ -94,18 +94,41 @@ describe('UserController', () => {
     });
   });
 
-
   describe('POST /auth/logout', () => {
+    let accessToken: string = '';
     beforeEach(async () => {
       await testService.deleteUser();
       await testService.createUser();
+      const loginRes = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'TestSample',
+          password: '123456',
+        });
+      accessToken = loginRes.body.token;
+      console.log('LOGIN TOKEN:', accessToken); // debug penting
     });
+
     it('should be rejected if the token is not valid', async () => {
-      const response = await request(app.getHttpServer()).post('/auth/logout').set('Authorization', 'Wrong');
+      const response = await request(app.getHttpServer())
+        .post('/auth/logout')
+        .set('Authorization', 'Wrong');
+
+      accessToken = response.body.token;
+
       console.log('STATUS:', response.status);
       console.log('BODY:', JSON.stringify(response.body, null, 2));
       expect(response.status).toBe(401);
       expect(response.body.errors).toBeDefined();
+    });
+    it('should be logout authenticated user', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/logout')
+        .set('Authorization', accessToken);
+      console.log('STATUS', response.status);
+      console.log('Current Token', accessToken);
+      console.log('BODY', JSON.stringify(response.body, null, 2));
+      expect(response.status).toBe(201);
     });
   });
 });
