@@ -7,8 +7,8 @@ import { TestModule } from './test.module';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { TestService } from './test.service';
 import request from 'supertest';
-import { response } from 'express';
 import { UserFilter } from '../src/user/user.filter';
+import { response } from 'express';
 
 describe('AuthController', () => {
   let app: INestApplication<App>;
@@ -124,11 +124,76 @@ describe('AuthController', () => {
     it('should be logout authenticated user', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/logout')
-        .set('Authorization', accessToken);
+        .set('Authorization', `Bearer ${accessToken}`);
       console.log('STATUS', response.status);
       console.log('Current Token', accessToken);
       console.log('BODY', JSON.stringify(response.body, null, 2));
       expect(response.status).toBe(201);
+    });
+  });
+  describe('GET /user/profile', () => {
+    let accessToken: string;
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+
+      const loginRes = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'TestSample',
+          password: '123456',
+        });
+      accessToken = loginRes.body.token;
+      console.log('Login Token', accessToken);
+    });
+    it('should be rejected if token is not valid', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/user/profile')
+        .set('Authorization', `Bearer invalid.invalid.invalid`);
+      console.log('Status Code:', response.status);
+      expect(response.status).toBe(401);
+      expect(response.body.errors).toBeDefined();
+    });
+    it('should be showing authenticated user', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/user/profile')
+        .set('Authorization', `Bearer ${accessToken}`);
+      logger.info('STATUS:', response.status);
+      logger.info(response.body);
+      expect(response.status).toBe(200);
+      expect(response.body.user).toBe('TestSample');
+    });
+  });
+  describe('GET /user/users', () => {
+    let accessToken: string;
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+      const loginResponse = await request(app.getHttpServer())
+        .post('/user/login')
+        .send({
+          username: 'TestSample',
+          password: '123456',
+        });
+      accessToken = loginResponse.body.token;
+    });
+    it('should be rejected if token is not valid', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/user/profile')
+        .set('Authorization', 'Bearer invalid.invalid.invalid');
+      logger.info('STATUS:', response.status);
+      logger.info(response.body);
+      expect(response.status).toBe(401);
+      expect(response.body.errors).toBeDefined();
+    });
+    it('should be showing users', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/user/users')
+        .set('Authorization', `Bearer ${accessToken}`);
+      logger.info('STATUS:', res.status);
+      logger.info(res.body);
+      expect(res.status).toBe(200);
+      // expect(res.body.data.length).toBe(4);
     });
   });
 });

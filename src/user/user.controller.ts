@@ -76,7 +76,7 @@ export class UserController {
     @Query('size', ParseIntPipe) size: number,
     @Query('page', ParseIntPipe) page: number,
   ): Promise<WebModel<any>> {
-    return this.userService.findAll(size, page);
+    return this.userService.findAll(page, size);
   }
 
   @Patch('me')
