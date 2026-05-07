@@ -71,7 +71,6 @@ export class UserController {
   @Get('/users')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Get all users' })
-  @Roles(ROLE.ADMIN)
   async getUsers(
     @Query('size', ParseIntPipe) size: number,
     @Query('page', ParseIntPipe) page: number,
@@ -105,8 +104,7 @@ export class UserController {
 
   @Get('/search')
   @HttpCode(200)
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(ROLE.ADMIN)
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Search Users' })
   async searchUsers(
     @Query() search: UserSearchRequest,

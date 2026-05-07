@@ -137,6 +137,7 @@ describe('AuthController', () => {
       await testService.deleteUser();
       await testService.createUser();
 
+      // run login request to get accessToken
       const loginRes = await request(app.getHttpServer())
         .post('/auth/login')
         .send({
@@ -170,16 +171,17 @@ describe('AuthController', () => {
       await testService.deleteUser();
       await testService.createUser();
       const loginResponse = await request(app.getHttpServer())
-        .post('/user/login')
+        .post('/auth/login')
         .send({
           username: 'TestSample',
           password: '123456',
         });
       accessToken = loginResponse.body.token;
+      logger.info(accessToken);
     });
     it('should be rejected if token is not valid', async () => {
       const response = await request(app.getHttpServer())
-        .get('/user/profile')
+        .get('/user/users')
         .set('Authorization', 'Bearer invalid.invalid.invalid');
       logger.info('STATUS:', response.status);
       logger.info(response.body);
@@ -189,11 +191,81 @@ describe('AuthController', () => {
     it('should be showing users', async () => {
       const res = await request(app.getHttpServer())
         .get('/user/users')
+        .query({
+          size: 4,
+          page: 1,
+        })
         .set('Authorization', `Bearer ${accessToken}`);
       logger.info('STATUS:', res.status);
+      logger.info(`current token ${accessToken}`);
       logger.info(res.body);
       expect(res.status).toBe(200);
-      // expect(res.body.data.length).toBe(4);
+      expect(res.body.data.length).toBe(4);
+      expect(res.body.paging.pages).toBe(1);
+      expect(res.body.paging.total_page).toBe(1);
+      expect(res.body.paging.total_item).toBe(4);
+    });
+  });
+  describe('GET /user/search', () => {
+    let accessToken: string;
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+
+      const loginResponse = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'TestSample',
+          password: '123456',
+        });
+      accessToken = loginResponse.body.token;
+    });
+    it('should be rejected if token is not valid', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/user/search')
+        .query({
+          search: 't',
+          page: 1,
+          size: 2,
+        })
+        .set('Authorization', `Bearer invalid.invalid`);
+      logger.info('STATUS:', response.status);
+      logger.info(response.body);
+      expect(response.status).toBe(401);
+      expect(response.body.errors).toBeDefined();
+    });
+    it('should be return empty array if search is not found', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/user/search')
+        .query({
+          search: 'invalid search',
+          page: 1,
+          size: 2,
+        })
+        .set('Authorization', `Bearer ${accessToken}`);
+      logger.info(response.body);
+      logger.info(response.status);
+      expect(response.body.data.length).toBe(0);
+      expect(response.status).toBe(200);
+      expect(response.body.paging.pages).toBe(1);
+      expect(response.body.paging.total_page).toBe(0);
+      expect(response.body.paging.total_item).toBe(0);
+    });
+    it('should be able to search with param', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/user/search')
+        .query({
+          search: 't',
+          page: 1,
+          size: 2,
+        })
+        .set('Authorization', `Bearer ${accessToken}`);
+      logger.info(response.body);
+      expect(response.status).toBe(200);
+      expect(response.body.data.length).toBe(2);
+      expect(response.body.paging.pages).toBe(1);
+      expect(response.body.paging.total_page).toBe(1);
+      expect(response.body.paging.total_item).toBe(2);
     });
   });
 });
