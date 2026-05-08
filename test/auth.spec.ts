@@ -309,5 +309,15 @@ describe('AuthController', () => {
       expect(response.status).toBe(200);
       expect(response.body.avatar).toBeDefined();
     });
+    it('should be update password', async () => {
+      const response = await request(app.getHttpServer())
+        .patch('/user/me')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .field({
+          password: 'update password',
+        });
+      logger.info(response.body);
+      expect(response.status).toBe(200);
+    });
   });
 });
