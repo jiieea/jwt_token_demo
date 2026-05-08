@@ -8,7 +8,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { TestService } from './test.service';
 import request from 'supertest';
 import { UserFilter } from '../src/user/user.filter';
-import { response } from 'express';
+import * as path from 'path';
 
 describe('AuthController', () => {
   let app: INestApplication<App>;
@@ -266,6 +266,48 @@ describe('AuthController', () => {
       expect(response.body.paging.pages).toBe(1);
       expect(response.body.paging.total_page).toBe(1);
       expect(response.body.paging.total_item).toBe(2);
+    });
+  });
+  describe('Patch /user/me', () => {
+    let accessToken: string;
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+
+      const loginRes = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'TestSample',
+          password: '123456',
+        });
+      accessToken = loginRes.body.token;
+    });
+    it('should be rejected if token is not valid', async () => {
+      const response = await request(app.getHttpServer())
+        .patch('/user/me')
+        .set('Authorization', `Bearer Invalid`)
+        .send({
+          avatar: 'test',
+          password: 'update password',
+        });
+      logger.info(response.body);
+      expect(response.status).toBe(401);
+      expect(response.body.errors).toBeDefined();
+    });
+    it('should be update avatar', async () => {
+      const response = await request(app.getHttpServer())
+        .patch('/user/me')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .attach(
+          'avatar',
+          path.resolve(
+            __dirname,
+            '../uploads/avatars/avatar-1778210023583-67.jpg',
+          ),
+        );
+      logger.info(response.body);
+      expect(response.status).toBe(200);
+      expect(response.body.avatar).toBeDefined();
     });
   });
 });

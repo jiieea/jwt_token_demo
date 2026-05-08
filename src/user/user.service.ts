@@ -91,7 +91,7 @@ export class UserService {
   async update(
     username: string,
     request: UserUpdateRequest,
-    file?: Express.Multer.File,
+    file?: Express.Multer.File, // ava image
   ) {
     const userUpdate = this.validationService.validation(
       UserValidation.UPDATE,
