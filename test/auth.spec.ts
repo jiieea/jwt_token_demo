@@ -9,6 +9,7 @@ import { TestService } from './test.service';
 import request from 'supertest';
 import { UserFilter } from '../src/user/user.filter';
 import * as path from 'path';
+import { response } from 'express';
 
 describe('AuthController', () => {
   let app: INestApplication<App>;
@@ -318,6 +319,47 @@ describe('AuthController', () => {
         });
       logger.info(response.body);
       expect(response.status).toBe(200);
+    });
+  });
+  describe('POST /user/profile', () => {
+    let accessToken: string;
+    let avatar: string;
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+
+      const loginRes = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'TestSample',
+          password: '123456',
+        });
+      accessToken = loginRes.body.token;
+      logger.info(`this is login token: ${accessToken}`);
+
+      const uploadAvatarRequest = await request(app.getHttpServer())
+        .patch('/user/profile')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .field({
+          avatar: 'avatar-1778338176405-857.jpg',
+        });
+      avatar = uploadAvatarRequest.body.avatar;
+    });
+    it('should be rejected if token is not valid', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/user/profile')
+        .set('Authorization', `Bearer Invalid`);
+      logger.info(res.body);
+      expect(res.status).toBe(401);
+      expect(res.body.errors).toBeDefined();
+    });
+    it('should be remove avatar', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/user/profile')
+        .set('Authorization', `Bearer ${accessToken}`);
+      logger.info(res.body);
+      expect(res.status).toBe(201);
+      expect(res.body.status).toBe('success');
     });
   });
 });
