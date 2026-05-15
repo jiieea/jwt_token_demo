@@ -35,10 +35,10 @@ import { WebModel } from '../model/web.model';
 @UseInterceptors(LogInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  @Get('/avatar/:filename')
+  @Get('/avatar')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(ROLE.ADMIN)
-  getAvatar(@Res() res: any, @Param('filename') filename: string) {
+  // @Roles(ROLE.ADMIN)
+  getAvatar(@Res() res: any, @Query('filename') filename: string) {
     const file = join(process.cwd(), 'uploads/avatars', filename);
     if (!fs.existsSync(file)) {
       return res.send(`File Not Found`);

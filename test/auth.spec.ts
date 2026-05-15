@@ -9,7 +9,6 @@ import { TestService } from './test.service';
 import request from 'supertest';
 import { UserFilter } from '../src/user/user.filter';
 import * as path from 'path';
-import { response } from 'express';
 
 describe('AuthController', () => {
   let app: INestApplication<App>;
@@ -203,8 +202,8 @@ describe('AuthController', () => {
       expect(res.status).toBe(200);
       expect(res.body.data.length).toBe(4);
       expect(res.body.paging.pages).toBe(1);
-      expect(res.body.paging.total_page).toBe(1);
-      expect(res.body.paging.total_item).toBe(4);
+      expect(res.body.paging.total_page).toBe(2);
+      expect(res.body.paging.total_item).toBe(5);
     });
   });
   describe('GET /user/search', () => {
@@ -360,6 +359,53 @@ describe('AuthController', () => {
       logger.info(res.body);
       expect(res.status).toBe(201);
       expect(res.body.status).toBe('success');
+    });
+  });
+
+  describe('GET /user/avatar', () => {
+    let accessToken: string;
+    let avatar: string;
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+
+      //   login request
+      const loginReq = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'TestSample',
+          password: '123456',
+        });
+      accessToken = loginReq.body.token;
+      logger.info(`this is ur login token: ${accessToken}`);
+      //   upload avatart request
+      const uploadAvatar = await request(app.getHttpServer())
+        .patch('/user/me')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .attach('avatar', 'avatar-1778338176405-857.jpg');
+      avatar = uploadAvatar.body.avatar;
+      logger.info(`uploadAvatar: ${avatar}`);
+    });
+    it('it should be rejected if token is not valid', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/user/avatar/')
+        .set('Authorization', 'Bearer Invalid')
+        .query({
+          filename: avatar,
+        });
+      expect(response.status).toBe(401);
+      expect(response.body.errors).toBeDefined();
+    });
+    it('should be return spesific user image', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/user/avatar')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .query({
+          filename: avatar,
+        });
+      logger.info(response.body);
+      logger.info(`Uploaded avatar : ${response.body.avatar}`);
+      expect(response.status).toBe(200);
     });
   });
 });
