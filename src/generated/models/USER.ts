@@ -182,6 +182,7 @@ export type USERWhereInput = {
   role?: Prisma.EnumROLEFilter<"USER"> | $Enums.ROLE
   token?: Prisma.StringNullableFilter<"USER"> | string | null
   avatar?: Prisma.StringNullableFilter<"USER"> | string | null
+  products?: Prisma.ProductListRelationFilter
 }
 
 export type USEROrderByWithRelationInput = {
@@ -190,6 +191,7 @@ export type USEROrderByWithRelationInput = {
   role?: Prisma.SortOrder
   token?: Prisma.SortOrderInput | Prisma.SortOrder
   avatar?: Prisma.SortOrderInput | Prisma.SortOrder
+  products?: Prisma.productOrderByRelationAggregateInput
   _relevance?: Prisma.USEROrderByRelevanceInput
 }
 
@@ -202,6 +204,7 @@ export type USERWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumROLEFilter<"USER"> | $Enums.ROLE
   token?: Prisma.StringNullableFilter<"USER"> | string | null
   avatar?: Prisma.StringNullableFilter<"USER"> | string | null
+  products?: Prisma.ProductListRelationFilter
 }, "username">
 
 export type USEROrderByWithAggregationInput = {
@@ -232,6 +235,7 @@ export type USERCreateInput = {
   role?: $Enums.ROLE
   token?: string | null
   avatar?: string | null
+  products?: Prisma.productCreateNestedManyWithoutUserInput
 }
 
 export type USERUncheckedCreateInput = {
@@ -240,6 +244,7 @@ export type USERUncheckedCreateInput = {
   role?: $Enums.ROLE
   token?: string | null
   avatar?: string | null
+  products?: Prisma.productUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type USERUpdateInput = {
@@ -248,6 +253,7 @@ export type USERUpdateInput = {
   role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
   token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  products?: Prisma.productUpdateManyWithoutUserNestedInput
 }
 
 export type USERUncheckedUpdateInput = {
@@ -256,6 +262,7 @@ export type USERUncheckedUpdateInput = {
   role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
   token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  products?: Prisma.productUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type USERCreateManyInput = {
@@ -312,6 +319,11 @@ export type USERMinOrderByAggregateInput = {
   avatar?: Prisma.SortOrder
 }
 
+export type USERScalarRelationFilter = {
+  is?: Prisma.USERWhereInput
+  isNot?: Prisma.USERWhereInput
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -324,6 +336,97 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
+export type USERCreateNestedOneWithoutProductsInput = {
+  create?: Prisma.XOR<Prisma.USERCreateWithoutProductsInput, Prisma.USERUncheckedCreateWithoutProductsInput>
+  connectOrCreate?: Prisma.USERCreateOrConnectWithoutProductsInput
+  connect?: Prisma.USERWhereUniqueInput
+}
+
+export type USERUpdateOneRequiredWithoutProductsNestedInput = {
+  create?: Prisma.XOR<Prisma.USERCreateWithoutProductsInput, Prisma.USERUncheckedCreateWithoutProductsInput>
+  connectOrCreate?: Prisma.USERCreateOrConnectWithoutProductsInput
+  upsert?: Prisma.USERUpsertWithoutProductsInput
+  connect?: Prisma.USERWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.USERUpdateToOneWithWhereWithoutProductsInput, Prisma.USERUpdateWithoutProductsInput>, Prisma.USERUncheckedUpdateWithoutProductsInput>
+}
+
+export type USERCreateWithoutProductsInput = {
+  username: string
+  password: string
+  role?: $Enums.ROLE
+  token?: string | null
+  avatar?: string | null
+}
+
+export type USERUncheckedCreateWithoutProductsInput = {
+  username: string
+  password: string
+  role?: $Enums.ROLE
+  token?: string | null
+  avatar?: string | null
+}
+
+export type USERCreateOrConnectWithoutProductsInput = {
+  where: Prisma.USERWhereUniqueInput
+  create: Prisma.XOR<Prisma.USERCreateWithoutProductsInput, Prisma.USERUncheckedCreateWithoutProductsInput>
+}
+
+export type USERUpsertWithoutProductsInput = {
+  update: Prisma.XOR<Prisma.USERUpdateWithoutProductsInput, Prisma.USERUncheckedUpdateWithoutProductsInput>
+  create: Prisma.XOR<Prisma.USERCreateWithoutProductsInput, Prisma.USERUncheckedCreateWithoutProductsInput>
+  where?: Prisma.USERWhereInput
+}
+
+export type USERUpdateToOneWithWhereWithoutProductsInput = {
+  where?: Prisma.USERWhereInput
+  data: Prisma.XOR<Prisma.USERUpdateWithoutProductsInput, Prisma.USERUncheckedUpdateWithoutProductsInput>
+}
+
+export type USERUpdateWithoutProductsInput = {
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type USERUncheckedUpdateWithoutProductsInput = {
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+
+/**
+ * Count Type USERCountOutputType
+ */
+
+export type USERCountOutputType = {
+  products: number
+}
+
+export type USERCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  products?: boolean | USERCountOutputTypeCountProductsArgs
+}
+
+/**
+ * USERCountOutputType without action
+ */
+export type USERCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the USERCountOutputType
+   */
+  select?: Prisma.USERCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * USERCountOutputType without action
+ */
+export type USERCountOutputTypeCountProductsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.productWhereInput
+}
 
 
 export type USERSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -332,6 +435,8 @@ export type USERSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   token?: boolean
   avatar?: boolean
+  products?: boolean | Prisma.USER$productsArgs<ExtArgs>
+  _count?: boolean | Prisma.USERCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["uSER"]>
 
 
@@ -345,10 +450,16 @@ export type USERSelectScalar = {
 }
 
 export type USEROmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"username" | "password" | "role" | "token" | "avatar", ExtArgs["result"]["uSER"]>
+export type USERInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  products?: boolean | Prisma.USER$productsArgs<ExtArgs>
+  _count?: boolean | Prisma.USERCountOutputTypeDefaultArgs<ExtArgs>
+}
 
 export type $USERPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "USER"
-  objects: {}
+  objects: {
+    products: Prisma.$productPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     username: string
     password: string
@@ -695,6 +806,7 @@ readonly fields: USERFieldRefs;
  */
 export interface Prisma__USERClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  products<T extends Prisma.USER$productsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.USER$productsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$productPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -746,6 +858,10 @@ export type USERFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   omit?: Prisma.USEROmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.USERInclude<ExtArgs> | null
+  /**
    * Filter, which USER to fetch.
    */
   where: Prisma.USERWhereUniqueInput
@@ -764,6 +880,10 @@ export type USERFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.USEROmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.USERInclude<ExtArgs> | null
+  /**
    * Filter, which USER to fetch.
    */
   where: Prisma.USERWhereUniqueInput
@@ -781,6 +901,10 @@ export type USERFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the USER
    */
   omit?: Prisma.USEROmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.USERInclude<ExtArgs> | null
   /**
    * Filter, which USER to fetch.
    */
@@ -830,6 +954,10 @@ export type USERFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.USEROmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.USERInclude<ExtArgs> | null
+  /**
    * Filter, which USER to fetch.
    */
   where?: Prisma.USERWhereInput
@@ -877,6 +1005,10 @@ export type USERFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Omit specific fields from the USER
    */
   omit?: Prisma.USEROmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.USERInclude<ExtArgs> | null
   /**
    * Filter, which USERS to fetch.
    */
@@ -926,6 +1058,10 @@ export type USERCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.USEROmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.USERInclude<ExtArgs> | null
+  /**
    * The data needed to create a USER.
    */
   data: Prisma.XOR<Prisma.USERCreateInput, Prisma.USERUncheckedCreateInput>
@@ -954,6 +1090,10 @@ export type USERUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Omit specific fields from the USER
    */
   omit?: Prisma.USEROmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.USERInclude<ExtArgs> | null
   /**
    * The data needed to update a USER.
    */
@@ -995,6 +1135,10 @@ export type USERUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.USEROmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.USERInclude<ExtArgs> | null
+  /**
    * The filter to search for the USER to update in case it exists.
    */
   where: Prisma.USERWhereUniqueInput
@@ -1021,6 +1165,10 @@ export type USERDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.USEROmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.USERInclude<ExtArgs> | null
+  /**
    * Filter which USER to delete.
    */
   where: Prisma.USERWhereUniqueInput
@@ -1041,6 +1189,30 @@ export type USERDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * USER.products
+ */
+export type USER$productsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the product
+   */
+  select?: Prisma.productSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the product
+   */
+  omit?: Prisma.productOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.productInclude<ExtArgs> | null
+  where?: Prisma.productWhereInput
+  orderBy?: Prisma.productOrderByWithRelationInput | Prisma.productOrderByWithRelationInput[]
+  cursor?: Prisma.productWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProductScalarFieldEnum | Prisma.ProductScalarFieldEnum[]
+}
+
+/**
  * USER without action
  */
 export type USERDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1052,4 +1224,8 @@ export type USERDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the USER
    */
   omit?: Prisma.USEROmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.USERInclude<ExtArgs> | null
 }

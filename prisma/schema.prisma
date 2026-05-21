@@ -11,7 +11,6 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 enum ROLE {
@@ -21,11 +20,25 @@ enum ROLE {
 
 // models
 model USER {
-  username String  @id @db.VarChar(100)
-  password String  @db.VarChar(100)
-  role     ROLE    @default(USER)
-  token    String? @db.LongText
+  username String    @id @db.VarChar(100)
+  password String    @db.VarChar(100)
+  role     ROLE      @default(USER)
+  token    String?   @db.LongText
   avatar   String?
+  products product[]
 
   @@map("users")
+}
+
+model product {
+  id            Int     @id @default(autoincrement())
+  product_name  String  @db.VarChar(100)
+  price         Int     @db.MediumInt()
+  quantity      Int     @db.MediumInt()
+  product_image String? @db.VarChar(255)
+  username      String  @db.VarChar(155)
+
+  user USER @relation(fields: [username], references: [username], onDelete: Cascade)
+
+  @@map("products")
 }

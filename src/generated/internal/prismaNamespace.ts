@@ -384,7 +384,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
-  USER: 'USER'
+  USER: 'USER',
+  product: 'product'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -400,7 +401,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "uSER"
+    modelProps: "uSER" | "product"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -470,6 +471,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    product: {
+      payload: Prisma.$productPayload<ExtArgs>
+      fields: Prisma.productFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.productFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.productFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productPayload>
+        }
+        findFirst: {
+          args: Prisma.productFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.productFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productPayload>
+        }
+        findMany: {
+          args: Prisma.productFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productPayload>[]
+        }
+        create: {
+          args: Prisma.productCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productPayload>
+        }
+        createMany: {
+          args: Prisma.productCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.productDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productPayload>
+        }
+        update: {
+          args: Prisma.productUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productPayload>
+        }
+        deleteMany: {
+          args: Prisma.productDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.productUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.productUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productPayload>
+        }
+        aggregate: {
+          args: Prisma.ProductAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProduct>
+        }
+        groupBy: {
+          args: Prisma.productGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.productCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -520,6 +587,18 @@ export const USERScalarFieldEnum = {
 export type USERScalarFieldEnum = (typeof USERScalarFieldEnum)[keyof typeof USERScalarFieldEnum]
 
 
+export const ProductScalarFieldEnum = {
+  id: 'id',
+  product_name: 'product_name',
+  price: 'price',
+  quantity: 'quantity',
+  product_image: 'product_image',
+  username: 'username'
+} as const
+
+export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -546,6 +625,15 @@ export const USEROrderByRelevanceFieldEnum = {
 export type USEROrderByRelevanceFieldEnum = (typeof USEROrderByRelevanceFieldEnum)[keyof typeof USEROrderByRelevanceFieldEnum]
 
 
+export const productOrderByRelevanceFieldEnum = {
+  product_name: 'product_name',
+  product_image: 'product_image',
+  username: 'username'
+} as const
+
+export type productOrderByRelevanceFieldEnum = (typeof productOrderByRelevanceFieldEnum)[keyof typeof productOrderByRelevanceFieldEnum]
+
+
 
 /**
  * Field references
@@ -570,6 +658,13 @@ export type EnumROLEFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
     
 
 /**
@@ -683,6 +778,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   uSER?: Prisma.USEROmit
+  product?: Prisma.productOmit
 }
 
 /* Types for Logging */
