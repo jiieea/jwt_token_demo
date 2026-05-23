@@ -1,4 +1,12 @@
-import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Inject,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -9,6 +17,9 @@ import { ROLE } from '../generated/client';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { imageFilter, productStorage } from '../../uploads/upload.config';
+import { CleanUpInterceptor } from '../../uploads/upload.interceptor';
 @Controller('/product')
 export class ProductController {
   constructor(
@@ -19,14 +30,29 @@ export class ProductController {
   @UseGuards(AuthGuard, RolesGuard)
   @Post('/create')
   @Roles(ROLE.ADMIN)
+  @UseInterceptors(
+    FileInterceptor('product', {
+      storage: productStorage,
+      fileFilter: imageFilter,
+      limits: {
+        fileSize: 1024 * 1024 * 2,
+      },
+    }),
+    CleanUpInterceptor,
+  )
   async postProduct(
     @Body() body: ProductRequest,
     @User('username') username: string,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<WebModel<ProductResponse>> {
-    console.log(username);
-    const newProduct = await this.productService.addProduct(username, body);
+    const newProduct = await this.productService.addProduct(
+      username,
+      body,
+      file,
+    );
     return {
       data: newProduct,
+      message: 'Create Product Success',
     };
   }
 }

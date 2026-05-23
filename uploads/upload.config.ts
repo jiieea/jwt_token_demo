@@ -1,5 +1,6 @@
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+import e from 'express';
 
 export const avatarStorage = diskStorage({
   destination: join(process.cwd(), 'uploads/avatars'),
@@ -9,6 +10,15 @@ export const avatarStorage = diskStorage({
     const ext = extname(file.originalname);
 
     cb(null, `avatar-${imageName}${ext}`);
+  },
+});
+
+export const productStorage = diskStorage({
+  destination: join(process.cwd(), 'uploads/products'),
+  filename(req: e.Request, file: Express.Multer.File, callback) {
+    const productImgName = Date.now() + '-' + Math.floor(Math.random() * 1000);
+    const ext = extname(file.originalname);
+    callback(null, `product-${productImgName}-${ext}`);
   },
 });
 

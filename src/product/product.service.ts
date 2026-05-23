@@ -17,18 +17,27 @@ export class ProductService {
   async addProduct(
     user: string,
     request: ProductRequest,
+    file?: Express.Multer.File,
   ): Promise<ProductResponse> {
-    console.log(`User ${user} creating new product`);
-    const productRequest = this.validationService.validation(
-      ProductValidation.ADD_PRODUCT,
-      request,
-    );
+    try {
+      const productRequest = this.validationService.validation(
+        ProductValidation.ADD_PRODUCT,
+        request,
+      );
 
-    return this.prismaService.product.create({
-      data: {
-        ...productRequest,
-        ...{ username: user },
-      },
-    });
+      if (file) {
+        productRequest.product_image = file.filename;
+      }
+
+      return this.prismaService.product.create({
+        data: {
+          ...productRequest,
+          ...{ username: user },
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 }

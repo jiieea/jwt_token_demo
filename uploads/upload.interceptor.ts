@@ -1,65 +1,33 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
-import { catchError, Observable } from 'rxjs';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
+import { catchError } from 'rxjs/operators';
 import fs from 'fs';
 import { join } from 'path';
 
+@Injectable()
 export class CleanUpInterceptor implements NestInterceptor {
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler<any>,
-  ): Observable<any> | Promise<Observable<any>> {
+  intercept(context: ExecutionContext, next: CallHandler) {
     const request = context.switchToHttp().getRequest();
-    const file = request.file;
 
     return next.handle().pipe(
-      catchError(async (err: Error) => {
-        const filesToDelete: string[] = [];
+      catchError(async (err) => {
+        if (request.file) {
+          const filePath = join(
+            process.cwd(),
+            request.file.destination,
+            request.file.filename,
+          );
 
-        //   handle single file
-        if (file) {
-          (request.file.destination, request.file.fileName);
-          filesToDelete.push(file);
+          if (fs.existsSync(filePath)) {
+            await fs.promises.unlink(filePath);
+          }
         }
 
-        if (Array.isArray(request.file)) {
-          request.file.forEach((file) => {
-            const filePath = join(
-              process.cwd(),
-              file.destination,
-              file.filename,
-            );
-            filesToDelete.push(filePath);
-          });
-        }
-
-        if (
-          request.file &&
-          typeof request.file === 'object' &&
-          !Array.isArray(request.file)
-        ) {
-          Object.values(request.file).forEach((fileArray: any) => {
-            fileArray.forEach((file) => {
-              const filePath = join(
-                process.cwd(),
-                file.destination,
-                file.filename,
-              );
-              filesToDelete.push(filePath);
-            });
-          });
-        }
-
-        await Promise.all(
-          filesToDelete.map(async (file) => {
-            try {
-              if (fs.existsSync(file)) {
-                await fs.promises.unlink(file);
-              }
-            } catch {
-              console.error(`Cleanup Error: ${err}`);
-            }
-          }),
-        );
+        throw err;
       }),
     );
   }

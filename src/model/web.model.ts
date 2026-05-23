@@ -1,5 +1,6 @@
 export class WebModel<T> {
   data?: T;
+  message?: string;
   paging?: Page;
   errors?: string;
 }

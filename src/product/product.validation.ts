@@ -9,8 +9,8 @@ export class ProductValidation {
       .regex(/^[A-Z].*$/, {
         message: 'Product must be start with uppercase letter',
       }),
-    price: z.number().positive(),
-    quantity: z.number().positive().min(0),
+    price: z.coerce.number().positive(),
+    quantity: z.coerce.number().positive().min(0),
     product_image: z.string().optional(),
   });
 }

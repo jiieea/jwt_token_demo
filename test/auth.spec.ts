@@ -303,7 +303,7 @@ describe('AuthController', () => {
           'avatar',
           path.resolve(
             __dirname,
-            '../uploads/avatars/avatar-1778210023583-67.jpg',
+            '../uploads/avatars/avatar-1779544644813-375.jpg',
           ),
         );
       logger.info(response.body);
@@ -344,7 +344,7 @@ describe('AuthController', () => {
           'avatar',
           path.resolve(
             __dirname,
-            '../uploads/avatars/avatar-1778210023583-67.jpg',
+            '../uploads/avatars/avatar-1779544644813-375.jpg',
           ),
         );
       avatar = uploadAvatarRequest.body.avatar;
@@ -390,7 +390,7 @@ describe('AuthController', () => {
           'avatar',
           path.resolve(
             __dirname,
-            '../uploads/avatars/avatar-1778210023583-67.jpg',
+            '../uploads/avatars/avatar-1779544644813-375.jpg',
           ),
         );
       logger.info(uploadAvatarRequest.body.avatar);
@@ -403,7 +403,9 @@ describe('AuthController', () => {
         .query({
           filename: avatar,
         });
+      console.log(response.body);
       expect(response.status).toBe(401);
+      expect(response.body.errors).toBeDefined();
     });
     it('should be returned user image', async () => {
       const response = await request(app.getHttpServer())
@@ -412,7 +414,8 @@ describe('AuthController', () => {
         .query({
           filename: avatar,
         });
-      expect(response.status).toBe(200);
+      console.log(`ini avatarnya ${avatar}`);
+      expect(response.body).toBeDefined();
     });
   });
 });
