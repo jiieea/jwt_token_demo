@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpCode,
   Inject,
   Post,
   UploadedFile,
@@ -29,6 +30,7 @@ export class ProductController {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Post('/create')
+  @HttpCode(201)
   @Roles(ROLE.ADMIN)
   @UseInterceptors(
     FileInterceptor('product', {

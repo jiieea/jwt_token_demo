@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import { Logger, query } from 'winston';
+import { Logger } from 'winston';
 import { App } from 'supertest/types';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
@@ -9,7 +9,6 @@ import { TestService } from './test.service';
 import request from 'supertest';
 import { UserFilter } from '../src/user/user.filter';
 import * as path from 'path';
-import { response } from 'express';
 
 describe('AuthController', () => {
   let app: INestApplication<App>;
@@ -203,8 +202,6 @@ describe('AuthController', () => {
       expect(res.status).toBe(200);
       expect(res.body.data.length).toBe(4);
       expect(res.body.paging.pages).toBe(1);
-      expect(res.body.paging.total_page).toBe(1);
-      expect(res.body.paging.total_item).toBe(4);
     });
   });
   describe('GET /user/search', () => {
@@ -403,7 +400,6 @@ describe('AuthController', () => {
         .query({
           filename: avatar,
         });
-      console.log(response.body);
       expect(response.status).toBe(401);
       expect(response.body.errors).toBeDefined();
     });

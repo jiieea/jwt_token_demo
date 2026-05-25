@@ -99,7 +99,6 @@ export class UserController {
     @Body() updateUserDto: UserUpdateRequest, // Ambil data teks (password)
     @UploadedFile() file: Express.Multer.File, // Ambil data file foto
   ) {
-    console.log(updateUserDto);
     return this.userService.update(username, updateUserDto, file);
   }
 
