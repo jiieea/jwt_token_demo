@@ -1,6 +1,8 @@
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import e from 'express';
+import path from 'node:path';
+import fs from 'fs';
 
 export const avatarStorage = diskStorage({
   destination: join(process.cwd(), 'uploads/avatars'),
@@ -28,4 +30,18 @@ export const imageFilter = (req, file, cb) => {
   }
 
   return cb(null, true);
+};
+
+export const replaceProductImage = (existingImage: string | null): void => {
+  if (!existingImage) return;
+
+  const oldPath = path.join(process.cwd(), '/uploads/products', existingImage);
+  try {
+    if (fs.existsSync(oldPath)) {
+      fs.unlinkSync(oldPath);
+      console.log(`Delete old product image ${existingImage}`);
+    }
+  } catch (error) {
+    console.error('Failed to delete image' + error.message);
+  }
 };

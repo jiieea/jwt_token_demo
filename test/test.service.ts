@@ -9,7 +9,13 @@ export class TestService implements OnModuleDestroy {
   async onModuleDestroy() {
     await this.prisma.$disconnect();
   }
-
+  async deleteProduct() {
+    await this.prisma.product.deleteMany({
+      where: {
+        product_name: 'Test',
+      },
+    });
+  }
   async createUser() {
     const hashedPassword = await bcrypt.hash('123456', 10);
     await this.prisma.uSER.create({
@@ -36,8 +42,9 @@ export class TestService implements OnModuleDestroy {
       },
     });
   }
+
   async createAdminUser() {
-    const hashedPassword = await bcrypt.hash('adminUser',10);
+    const hashedPassword = await bcrypt.hash('adminUser', 10);
     await this.prisma.uSER.create({
       data: {
         username: 'AdminUser',

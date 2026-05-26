@@ -92,5 +92,8 @@ describe('ProductController', () => {
       // Change this to 201 (or your expected success code) if admin should pass!
       expect(productReq.status).toBe(201);
     });
+    afterEach(async () => {
+      await testService.deleteProduct();
+    });
   });
 });
