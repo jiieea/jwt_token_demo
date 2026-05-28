@@ -68,6 +68,7 @@ export class ProductController {
   }
 
   @Patch('/update/:productId')
+  @HttpCode(201)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(ROLE.ADMIN)
   @UseInterceptors(

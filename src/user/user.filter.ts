@@ -22,18 +22,23 @@ export class UserFilter<T> implements ExceptionFilter {
       response.status(status).json({
         errors: errMsg,
       });
-    } else if (exception instanceof ZodError) {
+    } else if (this.isZodError(exception)) {
       response.status(400).json({
-        errors: exception.issues,
+        errors: (exception as ZodError).issues.map((issue) => issue.message),
       });
     } else if (exception instanceof multer.MulterError) {
       response.status(413).json({
-        errors: exception.message,
+        errors: 'File kegedeaan',
       });
     } else {
       response.status(500).json({
         errors: 'Internal Server Error',
       });
     }
+  }
+  private isZodError(exception: unknown): exception is ZodError {
+    return (
+      exception instanceof ZodError || (exception as any)?.name === 'ZodError'
+    );
   }
 }

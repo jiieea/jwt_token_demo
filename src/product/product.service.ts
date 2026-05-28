@@ -96,6 +96,12 @@ export class ProductService {
       where: { id: productUpdate.id, username: username },
     });
 
+    if (!existingProduct)
+      throw new HttpException(
+        `product not found with id ${productUpdate.id}`,
+        HttpStatus.NOT_FOUND,
+      );
+
     const updateData: Prisma.productUpdateInput = {
       ...(productUpdate.product_name && {
         product_name: productUpdate.product_name,

@@ -2,6 +2,7 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { ROLE } from '../src/generated/enums';
+import { ProductResponse } from '../src/model/product.model';
 @Injectable()
 export class TestService implements OnModuleDestroy {
   constructor(private prisma: PrismaService) {}
@@ -12,7 +13,7 @@ export class TestService implements OnModuleDestroy {
   async deleteProduct() {
     await this.prisma.product.deleteMany({
       where: {
-        product_name: 'Test',
+        product_name: 'AdminUser',
       },
     });
   }
@@ -50,6 +51,26 @@ export class TestService implements OnModuleDestroy {
         username: 'AdminUser',
         password: hashedPassword,
         role: ROLE.ADMIN,
+      },
+    });
+  }
+
+  async getProduct(): Promise<ProductResponse | null> {
+    return this.prisma.product.findFirst({
+      where: {
+        username: 'AdminUser',
+      },
+    });
+  }
+
+  async createProduct() {
+    await this.prisma.product.create({
+      data: {
+        username: 'AdminUser',
+        product_name: 'Product Test',
+        price: 10304,
+        quantity: 10,
+        product_image: 'test.jpg',
       },
     });
   }

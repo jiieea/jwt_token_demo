@@ -6,7 +6,6 @@ import { AppModule } from '../src/app.module';
 import { ProductFilter } from '../src/product/product.filter';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import request from 'supertest';
-import path from 'node:path';
 import { TestModule } from './test.module';
 import { TestService } from './test.service';
 
@@ -53,13 +52,7 @@ describe('ProductController', () => {
           price: 1000,
           quantity: 3,
         })
-        .attach(
-          'product',
-          path.resolve(
-            __dirname,
-            '../uploads/products/product-1779543967897-972-.jpg',
-          ),
-        );
+        .attach('product', Buffer.from('mock_file_content'), 'test.jpg');
       logger.info(productReq.body);
       expect(productReq.status).toBe(403);
     });
@@ -84,16 +77,80 @@ describe('ProductController', () => {
           price: 1000,
           quantity: 3,
         })
-        // Using a buffer eliminates streaming race conditions causing ECONNRESET
         .attach('product', Buffer.from('mock_file_content'), 'test.jpg');
 
       logger.info(productReq.body);
 
-      // Change this to 201 (or your expected success code) if admin should pass!
       expect(productReq.status).toBe(201);
     });
     afterEach(async () => {
       await testService.deleteProduct();
     });
+  });
+
+  describe('POST /product/update/:productId', () => {
+    beforeEach(async () => {
+      await testService.deleteAdmin();
+      await testService.createAdminUser();
+      await testService.createProduct();
+    });
+
+    it('should be reject if request is not valid', async () => {
+      const product = await testService.getProduct();
+      const loginReq = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ username: 'AdminUser', password: 'adminUser' });
+      const accessToken = loginReq.body.token;
+
+      const updateReq = await request(app.getHttpServer())
+        .patch(`/product/update/${product?.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .field({
+          product_name: 'test',
+        });
+      logger.info(updateReq.body);
+      expect(updateReq.status).toBe(400);
+      expect(updateReq.body.errors).toBeDefined();
+    });
+    it('should be rejected if product is not found', async () => {
+      const product = await testService.getProduct();
+      const loginReq = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ username: 'AdminUser', password: 'adminUser' });
+      const accessToken = loginReq.body.token;
+
+      // @ts-expect-error
+      const updateReq = await request(app.getHttpServer())
+        .patch(`/product/update/${product?.id + 1}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .field({
+          price: 500,
+          quantity: 5,
+        });
+      logger.info(updateReq.body);
+      expect(updateReq.status).toBe(404);
+      expect(updateReq.body.errors).toBeDefined();
+    });
+  });
+  it('should be update product', async () => {
+    const product = await testService.getProduct();
+    const loginReq = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ username: 'AdminUser', password: 'adminUser' });
+    const accessToken = loginReq.body.token;
+
+    const updateReq = await request(app.getHttpServer())
+      .patch(`/product/update/${product?.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .field({
+        product_name: 'UpdatedProduct',
+        price: 1000,
+      })
+      .attach('product', Buffer.from('mock_file_content'), 'update.jpg');
+    logger.info(updateReq.body);
+    expect(updateReq.status).toBe(201);
+  });
+  afterEach(async () => {
+    await testService.deleteProduct();
   });
 });

@@ -16,7 +16,6 @@ async function bootstrap() {
   const docs = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, docs);
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
-  app.useGlobalFilters(new UserFilter());
   app.useLogger(logger);
   await app.listen(process.env.PORT ?? 3000);
 }
