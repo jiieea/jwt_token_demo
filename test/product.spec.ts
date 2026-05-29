@@ -131,26 +131,65 @@ describe('ProductController', () => {
       expect(updateReq.status).toBe(404);
       expect(updateReq.body.errors).toBeDefined();
     });
-  });
-  it('should be update product', async () => {
-    const product = await testService.getProduct();
-    const loginReq = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({ username: 'AdminUser', password: 'adminUser' });
-    const accessToken = loginReq.body.token;
+    it('should be update product', async () => {
+      const product = await testService.getProduct();
+      const loginReq = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ username: 'AdminUser', password: 'adminUser' });
+      const accessToken = loginReq.body.token;
 
-    const updateReq = await request(app.getHttpServer())
-      .patch(`/product/update/${product?.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .field({
-        product_name: 'UpdatedProduct',
-        price: 1000,
-      })
-      .attach('product', Buffer.from('mock_file_content'), 'update.jpg');
-    logger.info(updateReq.body);
-    expect(updateReq.status).toBe(201);
+      const updateReq = await request(app.getHttpServer())
+        .patch(`/product/update/${product?.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .field({
+          product_name: 'UpdatedProduct',
+          price: 1000,
+        })
+        .attach('product', Buffer.from('mock_file_content'), 'update.jpg');
+      logger.info(updateReq.body);
+      expect(updateReq.status).toBe(201);
+    });
+    afterEach(async () => {
+      await testService.deleteProduct();
+    });
   });
-  afterEach(async () => {
-    await testService.deleteProduct();
+
+  describe('GET /product/products', () => {
+    let accessToken: string;
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+
+      const loginReq = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'TestSample',
+          password: '123456',
+        });
+      accessToken = loginReq.body.token;
+    });
+    it('should be reject if token is not found', async () => {
+      const req = await request(app.getHttpServer())
+        .get('/product/products')
+        .set('Authorization', `Bearer Invalid`)
+        .query({
+          page: 1,
+          size: 5,
+        });
+      logger.info(req.body);
+      expect(req.status).toBe(401);
+      expect(req.body.errors).toBeDefined();
+    });
+    it('should be show all products', async () => {
+      const req = await request(app.getHttpServer())
+        .get('/product/products')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .query({ page: 1, size: 5 });
+      logger.info(req.body);
+      expect(req.status).toBe(200);
+      expect(req.body.paging.pages).toBe(1);
+      expect(req.body.data.length).toBe(5);
+      expect(req.body.paging.total_page).toBe(1);
+    });
   });
 });
