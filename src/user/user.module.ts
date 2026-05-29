@@ -5,6 +5,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ValidationService } from '../validation/validation.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
+import { UserFilter } from './user.filter';
 
 @Module({
   imports: [
@@ -19,6 +21,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, PrismaService, ValidationService],
+  providers: [
+    UserService,
+    PrismaService,
+    ValidationService,
+    {
+      provide: APP_FILTER,
+      useClass: UserFilter,
+    },
+  ],
 })
 export class UserModule {}

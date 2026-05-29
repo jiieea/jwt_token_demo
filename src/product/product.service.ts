@@ -9,10 +9,9 @@ import {
   ProductResponse,
   ProductUpdateRequest,
 } from '../model/product.model';
-import fs from 'fs';
-import path from 'node:path';
 import { Prisma } from '../generated/client';
 import { replaceProductImage } from '../../uploads/upload.config';
+import { WebModel } from '../model/web.model';
 
 @Injectable()
 export class ProductService {
@@ -22,14 +21,13 @@ export class ProductService {
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
   ) {}
 
-  toProductResponse = (product: ProductResponse, username: string) => {
+  toProductResponse = (product: ProductResponse) => {
     return {
       id: product.id,
       product_name: product.product_name,
       price: product.price,
       quantity: product.quantity,
       product_image: product.product_image,
-      username: username,
     };
   };
 
@@ -75,9 +73,8 @@ export class ProductService {
           ...{ username: user },
         },
       });
-      return this.toProductResponse(newProduct, user);
+      return this.toProductResponse(newProduct);
     } catch (err) {
-      console.log(err);
       throw err;
     }
   }
@@ -95,6 +92,12 @@ export class ProductService {
     const existingProduct: any = await this.prismaService.product.findUnique({
       where: { id: productUpdate.id, username: username },
     });
+
+    if (!existingProduct)
+      throw new HttpException(
+        `product not found with id ${productUpdate.id}`,
+        HttpStatus.NOT_FOUND,
+      );
 
     const updateData: Prisma.productUpdateInput = {
       ...(productUpdate.product_name && {
@@ -114,5 +117,34 @@ export class ProductService {
       where: { id: productUpdate.id, username },
       data: updateData,
     });
+  }
+
+  async getProducts(
+    page: number,
+    size: number,
+  ): Promise<WebModel<ProductResponse[]>> {
+    const skip = (page - 1) * size;
+    const products = await this.prismaService.product.findMany({
+      skip: skip,
+      take: size,
+      select: {
+        id: true,
+        product_name: true,
+        price: true,
+        quantity: true,
+        product_image: true,
+      },
+    });
+
+    const total = await this.prismaService.product.count();
+
+    return {
+      data: products.map((product) => this.toProductResponse(product)),
+      paging: {
+        pages: page,
+        total_page: Math.ceil(total / size),
+        total_item: total,
+      },
+    };
   }
 }

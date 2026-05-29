@@ -1,12 +1,14 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Inject,
   Param,
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -68,6 +70,7 @@ export class ProductController {
   }
 
   @Patch('/update/:productId')
+  @HttpCode(201)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(ROLE.ADMIN)
   @UseInterceptors(
@@ -97,5 +100,15 @@ export class ProductController {
       data: updateProduct,
       message: 'Update Product Success',
     };
+  }
+
+  @Get('/products')
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  async getProducts(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('size', ParseIntPipe) size: number,
+  ) {
+    return this.productService.getProducts(page, size);
   }
 }
