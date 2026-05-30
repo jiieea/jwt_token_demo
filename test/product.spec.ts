@@ -192,4 +192,49 @@ describe('ProductController', () => {
       expect(req.body.paging.total_page).toBe(1);
     });
   });
+
+  describe('GET /product/search', () => {
+    let accessToken: string;
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+
+      const loginReq = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'TestSample',
+          password: '123456',
+        });
+      accessToken = loginReq.body.token;
+    });
+    it('should be rejected if token is not found', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/product/search')
+        .set('Authorization', `Bearer Invalid`)
+        .query({
+          search: 'M',
+          page: 1,
+          size: 2,
+        });
+      logger.info(res.body);
+      expect(res.status).toBe(401);
+      expect(res.body.errors).toBeDefined();
+    });
+    it('should be show search products', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/product/search')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .query({
+          search: 'M',
+          page: 1,
+          size: 2,
+        });
+      logger.info(res.body);
+      expect(res.status).toBe(200);
+      expect(res.body.data.length).toBe(2);
+      expect(res.body.paging.pages).toBe(1);
+      expect(res.body.paging.total_item).toBe(2);
+      expect(res.body.paging.total_page).toBe(1);
+    });
+  });
 });

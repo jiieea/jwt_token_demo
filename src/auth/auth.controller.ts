@@ -12,9 +12,12 @@ import {
   UserRequest,
   UserResponse,
 } from '../model/user.model';
-import { AuthGuard } from './guards/auth.guard';
+import { AuthGuard } from '../guard/auth.guard';
 import { LogInterceptor } from '../log/log.interceptor';
 import { User } from './decorators/auth.decorator';
+import { Throttle } from '@nestjs/throttler';
+
+@Throttle({ default: { ttl: 60000, limit: 3 } })
 @Controller('/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

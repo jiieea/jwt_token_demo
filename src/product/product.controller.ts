@@ -19,6 +19,7 @@ import { Logger } from 'winston';
 import {
   ProductRequest,
   ProductResponse,
+  ProductSearchRequest,
   ProductUpdateRequest,
   ProductUpdateResponse,
 } from '../model/product.model';
@@ -26,12 +27,13 @@ import { User } from '../auth/decorators/auth.decorator';
 import { WebModel } from '../model/web.model';
 import { ROLE } from '../generated/client';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { AuthGuard } from '../auth/guards/auth.guard';
+import { AuthGuard } from '../guard/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { imageFilter, productStorage } from '../../uploads/upload.config';
 import { CleanUpInterceptor } from '../../uploads/upload.interceptor';
 
+@UseGuards(AuthGuard)
 @Controller('/product')
 export class ProductController {
   constructor(
@@ -39,7 +41,7 @@ export class ProductController {
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
   ) {}
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Post('/create')
   @HttpCode(201)
   @Roles(ROLE.ADMIN)
@@ -71,7 +73,7 @@ export class ProductController {
 
   @Patch('/update/:productId')
   @HttpCode(201)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Roles(ROLE.ADMIN)
   @UseInterceptors(
     FileInterceptor('product', {
@@ -104,11 +106,20 @@ export class ProductController {
 
   @Get('/products')
   @HttpCode(200)
-  @UseGuards(AuthGuard)
   async getProducts(
     @Query('page', ParseIntPipe) page: number,
     @Query('size', ParseIntPipe) size: number,
   ) {
     return this.productService.getProducts(page, size);
+  }
+
+  @Get('/search')
+  @UseGuards(AuthGuard)
+  async search(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('size', ParseIntPipe) size: number,
+    @Query() search: ProductSearchRequest,
+  ) {
+    return this.productService.searchProducts(search, page, size);
   }
 }

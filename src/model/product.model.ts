@@ -27,3 +27,7 @@ export class ProductResponse {
   quantity: number;
   product_image?: string | null;
 }
+
+export class ProductSearchRequest {
+  search?: string;
+}

@@ -17,7 +17,7 @@ import {
 import { UserService } from './user.service';
 import { join } from 'path';
 import { UserSearchRequest, UserUpdateRequest } from '../model/user.model';
-import { AuthGuard } from '../auth/guards/auth.guard';
+import { AuthGuard } from '../guard/auth.guard';
 import { User } from '../auth/decorators/auth.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';

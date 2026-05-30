@@ -7,6 +7,7 @@ import { ValidationService } from '../validation/validation.service';
 import {
   ProductRequest,
   ProductResponse,
+  ProductSearchRequest,
   ProductUpdateRequest,
 } from '../model/product.model';
 import { Prisma } from '../generated/client';
@@ -75,6 +76,7 @@ export class ProductService {
       });
       return this.toProductResponse(newProduct);
     } catch (err) {
+      this.logger.info(err);
       throw err;
     }
   }
@@ -144,6 +146,49 @@ export class ProductService {
         pages: page,
         total_page: Math.ceil(total / size),
         total_item: total,
+      },
+    };
+  }
+
+  async searchProducts(
+    request: ProductSearchRequest,
+    page: number,
+    size: number,
+  ): Promise<WebModel<ProductResponse[]>> {
+    const searchProduct = this.validationService.validation(
+      ProductValidation.SEARCH,
+      request,
+    );
+    const skip = (page - 1) * size;
+
+    const searchCondition: any = {};
+    if (searchProduct.search) {
+      searchCondition.AND = [
+        {
+          product_name: {
+            contains: searchProduct.search,
+          },
+        },
+      ];
+    }
+
+    const products = await this.prismaService.product.findMany({
+      skip: skip,
+      take: size,
+      where: searchCondition,
+    });
+
+    const total = await this.prismaService.product.count({
+      where: searchCondition,
+    });
+    return {
+      data: products.map((product: ProductResponse) =>
+        this.toProductResponse(product),
+      ),
+      paging: {
+        pages: page,
+        total_item: total,
+        total_page: Math.ceil(total / size),
       },
     };
   }
