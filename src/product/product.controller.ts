@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Inject,
@@ -121,5 +122,22 @@ export class ProductController {
     @Query() search: ProductSearchRequest,
   ) {
     return this.productService.searchProducts(search, page, size);
+  }
+
+  @Delete('/delete/:productId')
+  @HttpCode(200)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(ROLE.ADMIN)
+  async deleteProduct(
+    @User('username') username: string,
+    @Param('productId', ParseIntPipe) productId: number,
+  ): Promise<WebModel<any>> {
+    const deleteProduct = await this.productService.deleteProduct(
+      username,
+      productId,
+    );
+    return {
+      data: deleteProduct,
+    };
   }
 }

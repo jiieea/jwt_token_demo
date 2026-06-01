@@ -5,6 +5,7 @@ import { Logger } from 'winston';
 import { ProductValidation } from './product.validation';
 import { ValidationService } from '../validation/validation.service';
 import {
+  DeleteProductResponse,
   ProductRequest,
   ProductResponse,
   ProductSearchRequest,
@@ -14,6 +15,14 @@ import { Prisma } from '../generated/client';
 import { replaceProductImage } from '../../uploads/upload.config';
 import { WebModel } from '../model/web.model';
 
+const PRODUCT_SELECT = {
+  id: true,
+  product_name: true,
+  price: true,
+  quantity: true,
+  product_image: true,
+} satisfies Prisma.productSelect;
+
 @Injectable()
 export class ProductService {
   constructor(
@@ -22,7 +31,7 @@ export class ProductService {
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
   ) {}
 
-  toProductResponse = (product: ProductResponse) => {
+  private toProductResponse(product: ProductResponse) {
     return {
       id: product.id,
       product_name: product.product_name,
@@ -30,9 +39,17 @@ export class ProductService {
       quantity: product.quantity,
       product_image: product.product_image,
     };
-  };
+  }
 
-  async checkProductToBeExist(
+  private buildSearchWhere(search?: string): Prisma.productWhereInput {
+    if (!search) return {};
+
+    return {
+      product_name: { contains: search },
+    };
+  }
+
+  private async findProductOrThrow(
     productId: number,
     username: string,
   ): Promise<ProductResponse> {
@@ -51,6 +68,22 @@ export class ProductService {
     }
 
     return product;
+  }
+
+  async deleteProduct(
+    username: string,
+    productId: number,
+  ): Promise<DeleteProductResponse> {
+    await this.findProductOrThrow(productId, username);
+    await this.prismaService.product.delete({
+      where: {
+        id: productId,
+      },
+    });
+    return {
+      success: true,
+      message: 'Product deleted successfully.',
+    };
   }
 
   async addProduct(
@@ -129,13 +162,7 @@ export class ProductService {
     const products = await this.prismaService.product.findMany({
       skip: skip,
       take: size,
-      select: {
-        id: true,
-        product_name: true,
-        price: true,
-        quantity: true,
-        product_image: true,
-      },
+      select: PRODUCT_SELECT,
     });
 
     const total = await this.prismaService.product.count();

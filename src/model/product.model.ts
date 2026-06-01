@@ -28,6 +28,11 @@ export class ProductResponse {
   product_image?: string | null;
 }
 
+export class DeleteProductResponse {
+  success: boolean;
+  message: string;
+}
+
 export class ProductSearchRequest {
   search?: string;
 }
