@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { UserFilter } from './user/user.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CustomThrottleGuard } from './guard/throttle.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

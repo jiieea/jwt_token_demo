@@ -26,6 +26,7 @@ model USER {
   token    String?   @db.LongText
   avatar   String?
   products product[]
+  cart     CART[]
 
   @@map("users")
 }
@@ -33,12 +34,26 @@ model USER {
 model product {
   id            Int     @id @default(autoincrement())
   product_name  String  @db.VarChar(100)
-  price         String  @db.VarChar(100)
-  quantity      String  @db.VarChar(100)
+  price         Int     @db.MediumInt
+  quantity      Int     @db.MediumInt
   product_image String? @db.VarChar(255)
   username      String  @db.VarChar(100)
 
-  user USER @relation(fields: [username], references: [username], onDelete: Cascade)
+  user  USER   @relation(fields: [username], references: [username], onDelete: Cascade)
+  carts CART[]
 
   @@map("products")
+}
+
+model CART {
+  product_id    Int     @id
+  username      String  @db.VarChar(100)
+  product_name  String  @db.VarChar(100)
+  price         Int     @db.MediumInt()
+  quantity      Int     @db.MediumInt()
+  product_image String  @db.VarChar(255)
+  user          USER    @relation(fields: [username], references: [username], onDelete: Cascade)
+  product       product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([username, product_id])
 }

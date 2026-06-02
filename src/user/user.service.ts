@@ -13,6 +13,13 @@ import { Logger } from 'winston';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { WebModel } from '../model/web.model';
+import { Prisma } from '../generated/client';
+
+const USER_SELECT = {
+  username: true,
+  role: true,
+  avatar: true,
+} satisfies Prisma.USERSelect;
 
 @Injectable()
 export class UserService {
@@ -22,7 +29,7 @@ export class UserService {
     private prismaService: PrismaService,
   ) {}
 
-  toUserResponse(user: UserResponse): UserResponse {
+  private toUserResponse(user: UserResponse): UserResponse {
     return {
       username: user.username,
       role: user.role,
@@ -30,28 +37,39 @@ export class UserService {
     };
   }
 
-  async findAll(page: number, size: number): Promise<WebModel<UserResponse[]>> {
+  private searchWhereInput(search?: string) {
+    if (!search) return {};
+    return {
+      username: { contains: search },
+    };
+  }
+
+  private async paginate(
+    where: Prisma.USERWhereInput,
+    page: number,
+    size: number,
+  ) {
     const skip = (page - 1) * size;
     const users = await this.prismaService.uSER.findMany({
       take: size,
-      skip: skip,
-      select: {
-        username: true,
-        role: true,
-        avatar: true,
-      },
+      skip,
+      where,
+      select: USER_SELECT,
     });
-
-    const total = await this.prismaService.uSER.count();
+    const total = await this.prismaService.uSER.count({ where });
 
     return {
-      data: users.map((user: UserResponse) => this.toUserResponse(user)),
+      data: users.map((user) => this.toUserResponse(user)),
       paging: {
         pages: page,
         total_item: total,
-        total_page: Math.ceil(total / size),
+        total_page: Math.ceil(total / total),
       },
     };
+  }
+
+  async findAll(page: number, size: number): Promise<WebModel<UserResponse[]>> {
+    return this.paginate({}, page, size);
   }
 
   async deleteAvatar(username: string) {
@@ -138,39 +156,11 @@ export class UserService {
     size: number,
     page: number,
   ): Promise<WebModel<UserResponse[]>> {
-    const searchRequest = this.validationService.validation(
+    const { search } = this.validationService.validation(
       UserValidation.SEARCH,
       request,
     );
-    const skip = (page - 1) * size;
 
-    const whereCondition: any = {};
-
-    if (searchRequest.search) {
-      whereCondition.AND = [
-        {
-          username: {
-            contains: searchRequest.search,
-          },
-        },
-      ];
-    }
-    const users = await this.prismaService.uSER.findMany({
-      skip: skip,
-      take: size,
-      where: whereCondition,
-    });
-    const total = await this.prismaService.uSER.count({
-      where: whereCondition,
-    });
-
-    return {
-      data: users.map((user) => this.toUserResponse(user)),
-      paging: {
-        pages: page,
-        total_item: total,
-        total_page: Math.ceil(total / size),
-      },
-    };
+    return this.paginate(this.searchWhereInput(search), page, size);
   }
 }

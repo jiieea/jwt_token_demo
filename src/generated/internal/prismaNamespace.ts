@@ -385,7 +385,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   USER: 'USER',
-  product: 'product'
+  product: 'product',
+  CART: 'CART'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,7 +402,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "uSER" | "product"
+    modelProps: "uSER" | "product" | "cART"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -537,6 +538,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CART: {
+      payload: Prisma.$CARTPayload<ExtArgs>
+      fields: Prisma.CARTFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CARTFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CARTPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CARTFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CARTPayload>
+        }
+        findFirst: {
+          args: Prisma.CARTFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CARTPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CARTFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CARTPayload>
+        }
+        findMany: {
+          args: Prisma.CARTFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CARTPayload>[]
+        }
+        create: {
+          args: Prisma.CARTCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CARTPayload>
+        }
+        createMany: {
+          args: Prisma.CARTCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.CARTDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CARTPayload>
+        }
+        update: {
+          args: Prisma.CARTUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CARTPayload>
+        }
+        deleteMany: {
+          args: Prisma.CARTDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CARTUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.CARTUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CARTPayload>
+        }
+        aggregate: {
+          args: Prisma.CARTAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCART>
+        }
+        groupBy: {
+          args: Prisma.CARTGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CARTGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CARTCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CARTCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -599,6 +666,18 @@ export const ProductScalarFieldEnum = {
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
 
 
+export const CARTScalarFieldEnum = {
+  product_id: 'product_id',
+  username: 'username',
+  product_name: 'product_name',
+  price: 'price',
+  quantity: 'quantity',
+  product_image: 'product_image'
+} as const
+
+export type CARTScalarFieldEnum = (typeof CARTScalarFieldEnum)[keyof typeof CARTScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -632,6 +711,15 @@ export const productOrderByRelevanceFieldEnum = {
 } as const
 
 export type productOrderByRelevanceFieldEnum = (typeof productOrderByRelevanceFieldEnum)[keyof typeof productOrderByRelevanceFieldEnum]
+
+
+export const CARTOrderByRelevanceFieldEnum = {
+  username: 'username',
+  product_name: 'product_name',
+  product_image: 'product_image'
+} as const
+
+export type CARTOrderByRelevanceFieldEnum = (typeof CARTOrderByRelevanceFieldEnum)[keyof typeof CARTOrderByRelevanceFieldEnum]
 
 
 
@@ -779,6 +867,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   uSER?: Prisma.USEROmit
   product?: Prisma.productOmit
+  cART?: Prisma.CARTOmit
 }
 
 /* Types for Logging */

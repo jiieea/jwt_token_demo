@@ -49,3 +49,8 @@ export type USER = Prisma.USERModel
  * 
  */
 export type product = Prisma.productModel
+/**
+ * Model CART
+ * 
+ */
+export type CART = Prisma.CARTModel

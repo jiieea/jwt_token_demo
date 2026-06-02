@@ -5,13 +5,23 @@ import { Logger } from 'winston';
 import { ProductValidation } from './product.validation';
 import { ValidationService } from '../validation/validation.service';
 import {
+  DeleteProductResponse,
   ProductRequest,
   ProductResponse,
+  ProductSearchRequest,
   ProductUpdateRequest,
 } from '../model/product.model';
 import { Prisma } from '../generated/client';
 import { replaceProductImage } from '../../uploads/upload.config';
 import { WebModel } from '../model/web.model';
+
+const PRODUCT_SELECT = {
+  id: true,
+  product_name: true,
+  price: true,
+  quantity: true,
+  product_image: true,
+} satisfies Prisma.productSelect;
 
 @Injectable()
 export class ProductService {
@@ -21,7 +31,7 @@ export class ProductService {
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
   ) {}
 
-  toProductResponse = (product: ProductResponse) => {
+  private toProductResponse(product: ProductResponse) {
     return {
       id: product.id,
       product_name: product.product_name,
@@ -29,9 +39,46 @@ export class ProductService {
       quantity: product.quantity,
       product_image: product.product_image,
     };
-  };
+  }
 
-  async checkProductToBeExist(
+  private buildSearchWhere(search?: string): Prisma.productWhereInput {
+    if (!search) return {};
+
+    return {
+      product_name: { contains: search },
+    };
+  }
+
+  private async paginate(
+    where: Prisma.productWhereInput,
+    page: number,
+    size: number,
+  ): Promise<WebModel<ProductResponse[]>> {
+    const skip = (page - 1) * size;
+
+    const [products, total] = await this.prismaService.$transaction([
+      this.prismaService.product.findMany({
+        skip: skip,
+        take: size,
+        where,
+        select: PRODUCT_SELECT,
+      }),
+      this.prismaService.product.count({ where }),
+    ]);
+
+    return {
+      data: products.map((product: ProductResponse) =>
+        this.toProductResponse(product),
+      ),
+      paging: {
+        pages: page,
+        total_item: total,
+        total_page: Math.ceil(total / size),
+      },
+    };
+  }
+
+  private async findProductOrThrow(
     productId: number,
     username: string,
   ): Promise<ProductResponse> {
@@ -50,6 +97,22 @@ export class ProductService {
     }
 
     return product;
+  }
+
+  async deleteProduct(
+    username: string,
+    productId: number,
+  ): Promise<DeleteProductResponse> {
+    await this.findProductOrThrow(productId, username);
+    await this.prismaService.product.delete({
+      where: {
+        id: productId,
+      },
+    });
+    return {
+      success: true,
+      message: 'Product deleted successfully.',
+    };
   }
 
   async addProduct(
@@ -75,6 +138,7 @@ export class ProductService {
       });
       return this.toProductResponse(newProduct);
     } catch (err) {
+      this.logger.info(err);
       throw err;
     }
   }
@@ -100,11 +164,11 @@ export class ProductService {
       );
 
     const updateData: Prisma.productUpdateInput = {
-      ...(productUpdate.product_name && {
+      ...(productUpdate.product_name != null && {
         product_name: productUpdate.product_name,
       }),
-      ...(productUpdate.price && { price: productUpdate.price }),
-      ...(productUpdate.quantity && { quantity: productUpdate.quantity }),
+      ...(productUpdate.price != null && { price: productUpdate.price }),
+      ...(productUpdate.quantity != null && { quantity: productUpdate.quantity }),
     };
 
     if (file) {
@@ -123,28 +187,19 @@ export class ProductService {
     page: number,
     size: number,
   ): Promise<WebModel<ProductResponse[]>> {
-    const skip = (page - 1) * size;
-    const products = await this.prismaService.product.findMany({
-      skip: skip,
-      take: size,
-      select: {
-        id: true,
-        product_name: true,
-        price: true,
-        quantity: true,
-        product_image: true,
-      },
-    });
+    return this.paginate({}, page, size);
+  }
 
-    const total = await this.prismaService.product.count();
+  async searchProducts(
+    request: ProductSearchRequest,
+    page: number,
+    size: number,
+  ): Promise<WebModel<ProductResponse[]>> {
+    const { search } = this.validationService.validation(
+      ProductValidation.SEARCH,
+      request,
+    );
 
-    return {
-      data: products.map((product) => this.toProductResponse(product)),
-      paging: {
-        pages: page,
-        total_page: Math.ceil(total / size),
-        total_item: total,
-      },
-    };
+    return this.paginate(this.buildSearchWhere(search), page, size);
   }
 }

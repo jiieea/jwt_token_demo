@@ -1,5 +1,9 @@
 import { ZodType, z } from 'zod';
-import { ProductRequest, ProductUpdateRequest } from '../model/product.model';
+import {
+  ProductRequest,
+  ProductSearchRequest,
+  ProductUpdateRequest,
+} from '../model/product.model';
 
 export class ProductValidation {
   static readonly ADD_PRODUCT: ZodType<ProductRequest> = z.object({
@@ -25,5 +29,8 @@ export class ProductValidation {
     price: z.coerce.number().positive().optional(),
     quantity: z.coerce.number().positive().optional(),
     product_image: z.string().optional(),
+  });
+  static readonly SEARCH: ZodType<ProductSearchRequest> = z.object({
+    search: z.string().optional(),
   });
 }

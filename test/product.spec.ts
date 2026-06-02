@@ -8,6 +8,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import request from 'supertest';
 import { TestModule } from './test.module';
 import { TestService } from './test.service';
+import { ProductRequest, ProductResponse } from '../src/model/product.model';
 
 describe('ProductController', () => {
   let app: INestApplication<App>;
@@ -119,7 +120,6 @@ describe('ProductController', () => {
         .send({ username: 'AdminUser', password: 'adminUser' });
       const accessToken = loginReq.body.token;
 
-      // @ts-expect-error
       const updateReq = await request(app.getHttpServer())
         .patch(`/product/update/${product?.id + 1}`)
         .set('Authorization', `Bearer ${accessToken}`)
@@ -188,8 +188,93 @@ describe('ProductController', () => {
       logger.info(req.body);
       expect(req.status).toBe(200);
       expect(req.body.paging.pages).toBe(1);
-      expect(req.body.data.length).toBe(5);
+      expect(req.body.data.length).toBe(3);
       expect(req.body.paging.total_page).toBe(1);
+    });
+  });
+
+  describe('GET /product/search', () => {
+    let accessToken: string;
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+
+      const loginReq = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'TestSample',
+          password: '123456',
+        });
+      accessToken = loginReq.body.token;
+    });
+    it('should be rejected if token is not found', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/product/search')
+        .set('Authorization', `Bearer Invalid`)
+        .query({
+          search: 'M',
+          page: 1,
+          size: 2,
+        });
+      logger.info(res.body);
+      expect(res.status).toBe(401);
+      expect(res.body.errors).toBeDefined();
+    });
+    it('should be show search products', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/product/search')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .query({
+          search: 'M',
+          page: 1,
+          size: 2,
+        });
+      logger.info(res.body);
+      expect(res.status).toBe(200);
+      expect(res.body.data.length).toBe(1);
+      expect(res.body.paging.pages).toBe(1);
+      expect(res.body.paging.total_item).toBe(1);
+      expect(res.body.paging.total_page).toBe(1);
+    });
+  });
+
+  describe('DELETE /product/:productId', () => {
+    beforeEach(async () => {
+      await testService.deleteAdmin();
+      await testService.createAdminUser();
+      await testService.createProduct();
+    });
+    it('should be rejected if token is not valid', async () => {
+      const loginReq = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'AdminUser',
+          password: 'adminUser',
+        });
+      const product: ProductResponse = await testService.getProduct();
+      const accessToken = loginReq.body.token;
+      const deleteReq = await request(app.getHttpServer())
+        .delete(`/product/delete/${product.id}`)
+        .set('Authorization', 'Bearer Invalid');
+      expect(deleteReq.status).toBe(401);
+      expect(deleteReq.body.errors).toBeDefined();
+    });
+    it('should be reject if product is not exits', async () => {
+      const loginReq = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: 'AdminUser',
+          password: 'adminUser',
+        });
+      const accessToken = loginReq.body.token;
+      const product: ProductResponse = await testService.getProduct();
+
+      const deleteReq = await request(app.getHttpServer())
+        .delete(`/product/delete/${product.id}`)
+        .set('Authorization', `Bearer ${accessToken}`);
+      logger.info(deleteReq.body);
+      expect(deleteReq.status).toBe(200);
+      expect(deleteReq.body.data.success).toBe(true);
     });
   });
 });

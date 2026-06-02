@@ -246,7 +246,7 @@ describe('AuthController', () => {
       expect(response.body.data.length).toBe(0);
       expect(response.status).toBe(200);
       expect(response.body.paging.pages).toBe(1);
-      expect(response.body.paging.total_page).toBe(0);
+      expect(response.body.paging.total_page).toBe(null);
       expect(response.body.paging.total_item).toBe(0);
     });
     it('should be able to search with param', async () => {
