@@ -10,4 +10,5 @@
  */
 export type * from './models/USER.js'
 export type * from './models/product.js'
+export type * from './models/CART.js'
 export type * from './commonInputTypes.js'

@@ -35,7 +35,7 @@ export class AuthGuard implements CanActivate {
       }
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException('Token not found');
+      throw new UnauthorizedException('Token gada boss');
     }
     return true;
   }

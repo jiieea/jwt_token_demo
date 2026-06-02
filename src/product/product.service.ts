@@ -49,6 +49,35 @@ export class ProductService {
     };
   }
 
+  private async paginate(
+    where: Prisma.productWhereInput,
+    page: number,
+    size: number,
+  ): Promise<WebModel<ProductResponse[]>> {
+    const skip = (page - 1) * size;
+
+    const [products, total] = await this.prismaService.$transaction([
+      this.prismaService.product.findMany({
+        skip: skip,
+        take: size,
+        where,
+        select: PRODUCT_SELECT,
+      }),
+      this.prismaService.product.count({ where }),
+    ]);
+
+    return {
+      data: products.map((product: ProductResponse) =>
+        this.toProductResponse(product),
+      ),
+      paging: {
+        pages: page,
+        total_item: total,
+        total_page: Math.ceil(total / size),
+      },
+    };
+  }
+
   private async findProductOrThrow(
     productId: number,
     username: string,
@@ -135,11 +164,11 @@ export class ProductService {
       );
 
     const updateData: Prisma.productUpdateInput = {
-      ...(productUpdate.product_name && {
+      ...(productUpdate.product_name != null && {
         product_name: productUpdate.product_name,
       }),
-      ...(productUpdate.price && { price: productUpdate.price }),
-      ...(productUpdate.quantity && { quantity: productUpdate.quantity }),
+      ...(productUpdate.price != null && { price: productUpdate.price }),
+      ...(productUpdate.quantity != null && { quantity: productUpdate.quantity }),
     };
 
     if (file) {
@@ -158,23 +187,7 @@ export class ProductService {
     page: number,
     size: number,
   ): Promise<WebModel<ProductResponse[]>> {
-    const skip = (page - 1) * size;
-    const products = await this.prismaService.product.findMany({
-      skip: skip,
-      take: size,
-      select: PRODUCT_SELECT,
-    });
-
-    const total = await this.prismaService.product.count();
-
-    return {
-      data: products.map((product) => this.toProductResponse(product)),
-      paging: {
-        pages: page,
-        total_page: Math.ceil(total / size),
-        total_item: total,
-      },
-    };
+    return this.paginate({}, page, size);
   }
 
   async searchProducts(
@@ -182,41 +195,11 @@ export class ProductService {
     page: number,
     size: number,
   ): Promise<WebModel<ProductResponse[]>> {
-    const searchProduct = this.validationService.validation(
+    const { search } = this.validationService.validation(
       ProductValidation.SEARCH,
       request,
     );
-    const skip = (page - 1) * size;
 
-    const searchCondition: any = {};
-    if (searchProduct.search) {
-      searchCondition.AND = [
-        {
-          product_name: {
-            contains: searchProduct.search,
-          },
-        },
-      ];
-    }
-
-    const products = await this.prismaService.product.findMany({
-      skip: skip,
-      take: size,
-      where: searchCondition,
-    });
-
-    const total = await this.prismaService.product.count({
-      where: searchCondition,
-    });
-    return {
-      data: products.map((product: ProductResponse) =>
-        this.toProductResponse(product),
-      ),
-      paging: {
-        pages: page,
-        total_item: total,
-        total_page: Math.ceil(total / size),
-      },
-    };
+    return this.paginate(this.buildSearchWhere(search), page, size);
   }
 }

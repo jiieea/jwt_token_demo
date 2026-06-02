@@ -183,6 +183,7 @@ export type USERWhereInput = {
   token?: Prisma.StringNullableFilter<"USER"> | string | null
   avatar?: Prisma.StringNullableFilter<"USER"> | string | null
   products?: Prisma.ProductListRelationFilter
+  cart?: Prisma.CARTListRelationFilter
 }
 
 export type USEROrderByWithRelationInput = {
@@ -192,6 +193,7 @@ export type USEROrderByWithRelationInput = {
   token?: Prisma.SortOrderInput | Prisma.SortOrder
   avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   products?: Prisma.productOrderByRelationAggregateInput
+  cart?: Prisma.CARTOrderByRelationAggregateInput
   _relevance?: Prisma.USEROrderByRelevanceInput
 }
 
@@ -205,6 +207,7 @@ export type USERWhereUniqueInput = Prisma.AtLeast<{
   token?: Prisma.StringNullableFilter<"USER"> | string | null
   avatar?: Prisma.StringNullableFilter<"USER"> | string | null
   products?: Prisma.ProductListRelationFilter
+  cart?: Prisma.CARTListRelationFilter
 }, "username">
 
 export type USEROrderByWithAggregationInput = {
@@ -236,6 +239,7 @@ export type USERCreateInput = {
   token?: string | null
   avatar?: string | null
   products?: Prisma.productCreateNestedManyWithoutUserInput
+  cart?: Prisma.CARTCreateNestedManyWithoutUserInput
 }
 
 export type USERUncheckedCreateInput = {
@@ -245,6 +249,7 @@ export type USERUncheckedCreateInput = {
   token?: string | null
   avatar?: string | null
   products?: Prisma.productUncheckedCreateNestedManyWithoutUserInput
+  cart?: Prisma.CARTUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type USERUpdateInput = {
@@ -254,6 +259,7 @@ export type USERUpdateInput = {
   token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.productUpdateManyWithoutUserNestedInput
+  cart?: Prisma.CARTUpdateManyWithoutUserNestedInput
 }
 
 export type USERUncheckedUpdateInput = {
@@ -263,6 +269,7 @@ export type USERUncheckedUpdateInput = {
   token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.productUncheckedUpdateManyWithoutUserNestedInput
+  cart?: Prisma.CARTUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type USERCreateManyInput = {
@@ -350,12 +357,27 @@ export type USERUpdateOneRequiredWithoutProductsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.USERUpdateToOneWithWhereWithoutProductsInput, Prisma.USERUpdateWithoutProductsInput>, Prisma.USERUncheckedUpdateWithoutProductsInput>
 }
 
+export type USERCreateNestedOneWithoutCartInput = {
+  create?: Prisma.XOR<Prisma.USERCreateWithoutCartInput, Prisma.USERUncheckedCreateWithoutCartInput>
+  connectOrCreate?: Prisma.USERCreateOrConnectWithoutCartInput
+  connect?: Prisma.USERWhereUniqueInput
+}
+
+export type USERUpdateOneRequiredWithoutCartNestedInput = {
+  create?: Prisma.XOR<Prisma.USERCreateWithoutCartInput, Prisma.USERUncheckedCreateWithoutCartInput>
+  connectOrCreate?: Prisma.USERCreateOrConnectWithoutCartInput
+  upsert?: Prisma.USERUpsertWithoutCartInput
+  connect?: Prisma.USERWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.USERUpdateToOneWithWhereWithoutCartInput, Prisma.USERUpdateWithoutCartInput>, Prisma.USERUncheckedUpdateWithoutCartInput>
+}
+
 export type USERCreateWithoutProductsInput = {
   username: string
   password: string
   role?: $Enums.ROLE
   token?: string | null
   avatar?: string | null
+  cart?: Prisma.CARTCreateNestedManyWithoutUserInput
 }
 
 export type USERUncheckedCreateWithoutProductsInput = {
@@ -364,6 +386,7 @@ export type USERUncheckedCreateWithoutProductsInput = {
   role?: $Enums.ROLE
   token?: string | null
   avatar?: string | null
+  cart?: Prisma.CARTUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type USERCreateOrConnectWithoutProductsInput = {
@@ -388,6 +411,7 @@ export type USERUpdateWithoutProductsInput = {
   role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
   token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cart?: Prisma.CARTUpdateManyWithoutUserNestedInput
 }
 
 export type USERUncheckedUpdateWithoutProductsInput = {
@@ -396,6 +420,59 @@ export type USERUncheckedUpdateWithoutProductsInput = {
   role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
   token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cart?: Prisma.CARTUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type USERCreateWithoutCartInput = {
+  username: string
+  password: string
+  role?: $Enums.ROLE
+  token?: string | null
+  avatar?: string | null
+  products?: Prisma.productCreateNestedManyWithoutUserInput
+}
+
+export type USERUncheckedCreateWithoutCartInput = {
+  username: string
+  password: string
+  role?: $Enums.ROLE
+  token?: string | null
+  avatar?: string | null
+  products?: Prisma.productUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type USERCreateOrConnectWithoutCartInput = {
+  where: Prisma.USERWhereUniqueInput
+  create: Prisma.XOR<Prisma.USERCreateWithoutCartInput, Prisma.USERUncheckedCreateWithoutCartInput>
+}
+
+export type USERUpsertWithoutCartInput = {
+  update: Prisma.XOR<Prisma.USERUpdateWithoutCartInput, Prisma.USERUncheckedUpdateWithoutCartInput>
+  create: Prisma.XOR<Prisma.USERCreateWithoutCartInput, Prisma.USERUncheckedCreateWithoutCartInput>
+  where?: Prisma.USERWhereInput
+}
+
+export type USERUpdateToOneWithWhereWithoutCartInput = {
+  where?: Prisma.USERWhereInput
+  data: Prisma.XOR<Prisma.USERUpdateWithoutCartInput, Prisma.USERUncheckedUpdateWithoutCartInput>
+}
+
+export type USERUpdateWithoutCartInput = {
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  products?: Prisma.productUpdateManyWithoutUserNestedInput
+}
+
+export type USERUncheckedUpdateWithoutCartInput = {
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumROLEFieldUpdateOperationsInput | $Enums.ROLE
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  products?: Prisma.productUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -405,10 +482,12 @@ export type USERUncheckedUpdateWithoutProductsInput = {
 
 export type USERCountOutputType = {
   products: number
+  cart: number
 }
 
 export type USERCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   products?: boolean | USERCountOutputTypeCountProductsArgs
+  cart?: boolean | USERCountOutputTypeCountCartArgs
 }
 
 /**
@@ -428,6 +507,13 @@ export type USERCountOutputTypeCountProductsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.productWhereInput
 }
 
+/**
+ * USERCountOutputType without action
+ */
+export type USERCountOutputTypeCountCartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CARTWhereInput
+}
+
 
 export type USERSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   username?: boolean
@@ -436,6 +522,7 @@ export type USERSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   token?: boolean
   avatar?: boolean
   products?: boolean | Prisma.USER$productsArgs<ExtArgs>
+  cart?: boolean | Prisma.USER$cartArgs<ExtArgs>
   _count?: boolean | Prisma.USERCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["uSER"]>
 
@@ -452,6 +539,7 @@ export type USERSelectScalar = {
 export type USEROmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"username" | "password" | "role" | "token" | "avatar", ExtArgs["result"]["uSER"]>
 export type USERInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   products?: boolean | Prisma.USER$productsArgs<ExtArgs>
+  cart?: boolean | Prisma.USER$cartArgs<ExtArgs>
   _count?: boolean | Prisma.USERCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -459,6 +547,7 @@ export type $USERPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "USER"
   objects: {
     products: Prisma.$productPayload<ExtArgs>[]
+    cart: Prisma.$CARTPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     username: string
@@ -807,6 +896,7 @@ readonly fields: USERFieldRefs;
 export interface Prisma__USERClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   products<T extends Prisma.USER$productsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.USER$productsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$productPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cart<T extends Prisma.USER$cartArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.USER$cartArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CARTPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1210,6 +1300,30 @@ export type USER$productsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.ProductScalarFieldEnum | Prisma.ProductScalarFieldEnum[]
+}
+
+/**
+ * USER.cart
+ */
+export type USER$cartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CART
+   */
+  select?: Prisma.CARTSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CART
+   */
+  omit?: Prisma.CARTOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CARTInclude<ExtArgs> | null
+  where?: Prisma.CARTWhereInput
+  orderBy?: Prisma.CARTOrderByWithRelationInput | Prisma.CARTOrderByWithRelationInput[]
+  cursor?: Prisma.CARTWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CARTScalarFieldEnum | Prisma.CARTScalarFieldEnum[]
 }
 
 /**
