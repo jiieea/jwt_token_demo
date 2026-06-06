@@ -7,6 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ProductModule } from '../product/product.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { CartModule } from '../cart/cart.module';
 import { CustomThrottleGuard } from '../guard/throttle.guard';
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CustomThrottleGuard } from '../guard/throttle.guard';
       },
     ]),
     UserModule,
+    CartModule,
     ProductModule,
     AuthModule,
   ],

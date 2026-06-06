@@ -667,12 +667,10 @@ export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeo
 
 
 export const CARTScalarFieldEnum = {
-  product_id: 'product_id',
+  id: 'id',
   username: 'username',
-  product_name: 'product_name',
-  price: 'price',
-  quantity: 'quantity',
-  product_image: 'product_image'
+  product_id: 'product_id',
+  quantity: 'quantity'
 } as const
 
 export type CARTScalarFieldEnum = (typeof CARTScalarFieldEnum)[keyof typeof CARTScalarFieldEnum]
@@ -714,9 +712,7 @@ export type productOrderByRelevanceFieldEnum = (typeof productOrderByRelevanceFi
 
 
 export const CARTOrderByRelevanceFieldEnum = {
-  username: 'username',
-  product_name: 'product_name',
-  product_image: 'product_image'
+  username: 'username'
 } as const
 
 export type CARTOrderByRelevanceFieldEnum = (typeof CARTOrderByRelevanceFieldEnum)[keyof typeof CARTOrderByRelevanceFieldEnum]
