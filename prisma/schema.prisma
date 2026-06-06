@@ -46,14 +46,13 @@ model product {
 }
 
 model CART {
-  product_id    Int     @id
-  username      String  @db.VarChar(100)
-  product_name  String  @db.VarChar(100)
-  price         Int     @db.MediumInt()
-  quantity      Int     @db.MediumInt()
-  product_image String  @db.VarChar(255)
-  user          USER    @relation(fields: [username], references: [username], onDelete: Cascade)
-  product       product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  id         Int     @id @default(autoincrement())
+  username   String  @db.VarChar(100)
+  product_id Int
+  quantity   Int
+  user       USER    @relation(fields: [username], references: [username], onDelete: Cascade)
+  product    product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 
   @@unique([username, product_id])
+  @@map("carts")
 }
