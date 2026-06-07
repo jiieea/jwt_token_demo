@@ -3,7 +3,11 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { PrismaService } from '../prisma/prisma.service';
 import { ValidationService } from '../validation/validation.service';
-import { AddToCartRequest, CartItemResponse } from '../model/cart.model';
+import {
+  CartRequest,
+  CartItemResponse,
+  SummaryCartResponse,
+} from '../model/cart.model';
 import { WebModel } from '../model/web.model';
 import { CartValidation } from './cart.validation';
 
@@ -79,7 +83,7 @@ export class CartService {
   }
 
   async addToCart(
-    request: AddToCartRequest,
+    request: CartRequest,
     username: string,
   ): Promise<WebModel<CartItemResponse>> {
     const productRequest = this.validationService.validation(
@@ -95,16 +99,15 @@ export class CartService {
     if (existing) {
       //   update quantity
       this.logger.info(`username re-added product`);
-      const update = await this.prismaService.cART.update({
+      cartRow = await this.prismaService.cART.update({
         where: { id: existing.id },
         data: {
           quantity: { increment: productRequest.quantity },
         },
         select: CART_SELECT,
       });
-      cartRow = update;
     } else {
-      const create = await this.prismaService.cART.create({
+      cartRow = await this.prismaService.cART.create({
         data: {
           username,
           product_id: productRequest.product_id,
@@ -112,10 +115,55 @@ export class CartService {
         },
         select: CART_SELECT,
       });
-      cartRow = create;
     }
     return {
       data: this.toCartResponse(cartRow),
+    };
+  }
+
+  async getCarts(username: string): Promise<SummaryCartResponse> {
+    const carts = await this.prismaService.cART.findMany({
+      where: { username },
+      select: CART_SELECT,
+    });
+
+    const items = carts.map((cart) => this.toCartResponse(cart));
+
+    return {
+      items: items,
+      total_items: items.reduce((sum, i) => sum + i.quantity, 0),
+      tota_price: items.reduce((sum, i) => sum + i.subtotal, 0),
+    };
+  }
+
+  async updateCart(
+    cartItemId: number,
+    request: CartRequest,
+    username: string,
+  ): Promise<WebModel<CartItemResponse>> {
+    const updateRequest = this.validationService.validation(
+      CartValidation.UDPATE,
+      request,
+    );
+    const existing = await this.findCartOrThrow(cartItemId, username);
+    if (existing.product.id !== updateRequest.product_id) {
+      throw new HttpException(
+        `Product id does not match the cart item with id ${updateRequest.product_id} `,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    this.logger.info(
+      `User "${username}" updated cart item ${cartItemId} qty: ${existing.quantity} → ${updateRequest.quantity}`,
+    );
+
+    const update = await this.prismaService.cART.update({
+      where: { id: cartItemId },
+      data: { quantity: updateRequest.quantity },
+      select: CART_SELECT,
+    });
+
+    return {
+      data: this.toCartResponse(update),
     };
   }
 }

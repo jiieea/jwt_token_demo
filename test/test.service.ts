@@ -28,20 +28,33 @@ export class TestService implements OnModuleDestroy {
     });
   }
 
-  async deleteUser() {
-    await this.prisma.uSER.deleteMany({
+  async deleteAdmin() {
+    // 1. Delete carts that reference AdminUser's products
+    await this.prisma.cART.deleteMany({
       where: {
-        username: 'TestSample',
+        username: 'AdminUser',
       },
     });
-  }
 
-  async deleteAdmin() {
+    // 2. Delete products belonging to AdminUser
+    await this.prisma.product.deleteMany({
+      where: {
+        username: 'AdminUser',
+      },
+    });
+
+    // 3. Now safe to delete the user
     await this.prisma.uSER.deleteMany({
       where: {
         username: 'AdminUser',
       },
     });
+  }
+
+  async deleteUser() {
+    await this.prisma.cART.deleteMany({ where: { username: 'TestSample' } });
+    await this.prisma.product.deleteMany({ where: { username: 'TestSample' } });
+    await this.prisma.uSER.deleteMany({ where: { username: 'TestSample' } });
   }
 
   async createAdminUser() {

@@ -26,7 +26,7 @@ import {
 } from '../model/product.model';
 import { User } from '../auth/decorators/auth.decorator';
 import { WebModel } from '../model/web.model';
-import { ROLE } from '../generated/client';
+import { ROLE } from '../generated/enums';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AuthGuard } from '../guard/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';

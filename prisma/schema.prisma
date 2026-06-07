@@ -34,7 +34,7 @@ model USER {
 model product {
   id            Int     @id @default(autoincrement())
   product_name  String  @db.VarChar(100)
-  price         Int     @db.MediumInt
+  price         Int
   quantity      Int     @db.MediumInt
   product_image String? @db.VarChar(255)
   username      String  @db.VarChar(100)
